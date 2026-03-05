@@ -264,23 +264,63 @@
     *   **최종 생성 변수명:** `LateSeason_Lon_Fatigue_Diff`, `LateSeason_Travel_Fatigue_Diff`
 
 ### I. 자체 레이팅 지표 (Advanced Ratings)
+> **중요 가이드라인**: 기존 A~H 파트 분류에 속하지 않거나 복합적으로 생성된 모든 새로운 외부 랭킹 및 자체 알고리즘 파생 변수들은 이 섹션에서 취합하여 관리합니다.
+
+**사용 데이터:** 
+- `MRegularSeasonCompactResults.csv`, `WRegularSeasonCompactResults.csv`
+- `MNCAATourneyCompactResults.csv`, `WNCAATourneyCompactResults.csv`
+- `MRegularSeasonDetailedResults.csv`, `WRegularSeasonDetailedResults.csv`
+- `*SecondaryTourneyCompactResults.csv`
+- `MMasseyOrdinals.csv` (남성만)
+- `MTeamCoaches.csv` (감독 토너먼트 기록, 남성만)
+- `MNCAATourneySeeds.csv`, `WNCAATourneySeeds.csv`
+- `MTeamConferences.csv`, `WTeamConferences.csv`
+
+**주요 파생 변수 및 전처리 방법 (Feature Engineering):**
+
 *   **1. 세밀한 보정이 들어간 홈-원정 어드밴티지 Elo 레이팅 (Home-Adjusted Advanced Elo)**:
-    *   **전처리:** 단순 승패 기반 고정 K-Factor Elo가 아니라, **홈 코트 시에는 점수를 보정(예: +80~100)하여 기대승률수식(`We`)을 통제**하고, 경기의 점수 차(Margin) 기복에 따라 **Elo 변동폭 함수(`K-Factor`)에 가중치를 주는** 고급 피처입니다. 타 하위 포스트시즌(Secondary 투어리먼트) 대회의 전적까지 포함하며, 매 시즌 리셋되는 대신 작년 점수의 75%를 계승하는 Mean Reversion 방식을 취해 연속성을 부여합니다.
-    *   **최종 생성 변수명:** `Elo_Rating_Diff`, `Elo_WinProb_Neutral`
+    *   **전처리:** 단순 승패 기반 고정 K-Factor Elo가 아니라, **홈 코트 시에는 점수를 보정(예: +75~100)하여 기대승률수식(`We`)을 통제**하고, 경기의 점수 차(Margin) 기복에 따라 **Elo 변동폭 함수(`K-Factor`)에 가중치를 주는** 고급 피처입니다. 타 하위 포스트시즌(Secondary 투어리먼트) 대회의 전적까지 모두 포함하며, 매 시즌 리셋되는 대신 작년 점수의 평균 75%를 계승하는 평균 회귀(Mean Reversion) 방식을 취해 연속성을 부여합니다.
+    *   **최종 생성 변수명:** `Elo_Rating_Diff`, `Elo_WinProb_Neutral`, `T1_EloEndSeason`, `T2_EloEndSeason`, `T1_EloPreTourney`, `T2_EloPreTourney`, `IX_Elo_x_Seed`, `IX_Elo_x_Net`
 *   **2. SRS (Simple Rating System) 선형대수학 강도 스코어 기반 가짜 스탯 판독기**:
     *   **전처리:** 팀의 '득실 마진 배열'과 해당 팀들이 맞붙은 '상대 전적 네트워크 행렬'을 만들어, 파이썬 NumPy 선형 방정식(`np.linalg.solve`)을 수학적으로 풉니다. 이 방정식을 통해 "약팀 학살로 쌓은 가짜 마진"과 "강팀 원정에서 기록한 진짜 마진"을 분별할 수 있는 핵심 구조적 강도 스코어를 산출합니다.
-    *   **최종 생성 변수명:** `SRS_Diff`
+    *   **최종 생성 변수명:** `SRS_Diff`, `T1_SRS_recent`, `T2_SRS_recent`
 *   **3. 파워 랭킹 결합 및 기대 시드 (Power Composite & Expected Seed)**:
     *   **전처리:** 위에서 구한 `Elo`, `SRS`, 그리고 `AdjNetRtg`, `WinPct_recent`, `Margin_recent` 피처들을 모두 Z-Score 정규화로 스케일링한 후, 각각 0.3, 0.2 등의 고정 계수 가중치를 두어 하나로 합칩니다. 이 **'Power Composite'** 점수를 바탕으로 전체 현존하는 68개 팀 내의 가상 등수를 매겨 **자체 기대 시드(Expected Seed)**를 역산해 부여합니다.
-    *   **최종 생성 변수명:** `Expected_Seed_Diff`, `Power_Composite_Diff`, `Actual_vs_Expected_Seed_Ratio`
+    *   **최종 생성 변수명:** `Expected_Seed_Diff`, `Power_Composite_Diff`, `Actual_vs_Expected_Seed_Ratio`, `T1_ExpectedSeed`, `T2_ExpectedSeed`
+*   **4. 기계학습/외부 Massey Ordinals 통합 랭킹 지표**:
+    *   **전처리:** POM, SAG, MOR, COL 등 7~8개 주요 컴퓨터 랭킹 시스템을 선별하여, 각 시스템별 시즌 마지막 날짜의 `OrdinalRank`를 가져와 0~1 사이의 백분위 또는 Z-스코어로 변환합니다. 변환된 순위의 평균치, 최저치, 중앙값 및 여러 랭킹 시스템 간의 불일치성(일관성)을 잴 수 있는 **표준편차(MasStd)**를 구합니다.
+    *   **최종 생성 변수명:** `MasMean_Diff`, `MasMin_Diff`, `MasStd_Diff`, `MasPOM_Diff`, `MasSAG_Diff`, `Massey_x_Elo`
+*   **5. 빌 제임스 피타고리안 기댓값 (Pythagorean Expectation) 및 시드 교호작용**:
+    *   **전처리:** 득점 비율(`AvgScore^11.5 / (AvgScore^11.5 + AvgAllow^11.5)`)에서 나오는 순수 승리 확률을 도출합니다. 또한, 자체 레이팅(Elo/Net Rating)과 실제 배치된 '토너먼트 시드' 사이의 차이 혹은 곱(`Interaction`)을 통해, 실제 실력은 좋은데 억울하게 낮은 시드를 받은 "업셋(Upset)" 기대 팀을 모델이 찾아내도록 돕습니다.
+    *   **최종 생성 변수명:** `Pyth_Diff`, `IX_Seed_x_Pyth`, `SeedWinProb`, `UpsetScore`, `HotnessScore`
+*   **6. 감독 토너먼트 승률 (Coach Tournament Records)**:
+    *   **전처리:** 현재 시즌까지 해당 감독(Coach)의 역대 토너먼트 종합 누적 승/패를 1차원적으로 합산 계산하여 토너먼트 무대 승률을 생성합니다 (초보나 정보 부재 감독은 0.5 중립처리).
+    *   **최종 생성 변수명:** `CoachTWR_Diff`, `T1_CoachTWR`, `T2_CoachTWR`
+*   **7. H2H 상대 전적 확률 축소 (Bayesian Head-to-Head)**:
+    *   **전처리:** T1과 T2 간 역대 포스트시즌(토너먼트) 맞대결이 존재한다면 과거 승률을 산출하되, 표본이 1~2개 밖에 없는 경우의 극단값 과적합을 방지하기 위해 `사전 확률(0.5)`과 가상 3경기 분량을 섞어 베이지안 축소 변수를 생성합니다.
+    *   **최종 생성 변수명:** `H2H_WinRate`, `H2H_Games`
+*   **8. 토너먼트 경험 6년 누적 지표 (Tournament Experience)**:
+    *   **전처리:** 최근 6개 연도 동안 각 팀이 토너먼트에 얼마나 자주 출전했는지, 평균 몇 승을 올렸는지, 16강 이상의 딥런(`DeepRunRate`)을 했는지를 누적 계산하여 수치화시킵니다.
+    *   **최종 생성 변수명:** `TourneyApps_Diff`, `TourneyWPG_Diff`, `DeepRunRate_Diff`, `SeedAvg_Diff`
 
 ### J. 데이터베이스 증강 기법 (Data Augmentation) - 함수 호출 전용
 > 📌 **주의**: J 파트는 팀별 통계 CSV 파일(`advanced_ratings_[M/W].csv` 등)을 생성하는 것이 아닙니다. A~I 파트까지 생성된 피처들을 모아 **최종 학습용 매치업 데이터프레임(`train_df`)을 만들었을 때, 모델 학습 직전에 메모리 상에서만 데이터를 증폭(Augmentation)**하는 훈련 전용 함수 로직입니다. 
 
-*   **1. 연속형 데이터 가우시안 노이즈 (Gaussian Noise for Continuous Features)**:
-    *   **전처리 (Train 데이터 한정):** 승리에 영향을 미치는 `Possessions_Diff` 나 `WinRate` 같은 연속형 변수 공간에 정규분포 가우시안 노이즈(Gaussian Noise)를 더해줍니다 (`NOISE_SCALE = 0.03` 등). 오버피팅을 억제하며, 미세하게 확률적 변동성이 생긴 Train Set 위에서 트리 계열 모델들이 더 강건하게 테스트 데이터(Test)에서 생존하도록 튜닝하는 기법입니다.
-*   **2. 데이터 대칭 스왑 증강 (Data Swapping Augmentation) 처리**:
-    *   **전처리 (Train 데이터 한정):** T1이 T2를 이겼다(Label=1)는 것은 T2가 T1에게 졌다(Label=0)는 완벽한 대칭입니다. Train 데이터에서 T1과 T2의 순서를 강제로 모두 바꾼(Flip) 반전 데이터열을 만들고, Label을 `1 - Label`로 만들어 기존 Train Data에 1배수 더 복사(Concat)합니다. 이를 통해 모델이 특정 ID 순번에 편향되지 않고 방향성을 중립적으로 학습하며, 학습 데이터 개수가 총 2배(Augmentation)로 늘어납니다. 반전된 데이터 행에는 식별을 위해 `Is_Augmented=1` 피처를 부여합니다.
+**사용 데이터:** 학습용 기반 매치업 풀 세트 (정규시즌/토너먼트/하위 포스트시즌 결과 등 A~I 파트를 통해 완성된 매치업 140~300개 피처의 배열)
+
+*   **1. 데이터 대칭 스왑 증강 (Symmetric Data Swapping Augmentation) 처리**:
+    *   **전처리 (Train 데이터 한정):** T1이 T2를 이겼다(Label=1)는 것은 T2가 T1에게 졌다(Label=0)는 완벽한 대칭입니다. Train 데이터에서 T1-T2 관련 열(`T1_` ↔ `T2_` 교체, 차이값인 `_Diff`의 부호 반전 `-Diff`)의 순서를 강제로 모두 바꾼(Flip) 반전 데이터열을 만들고, `Label = 1 - Label`로 만들어 기존 Train Data에 1배수 더 복사(Concat)하여 이어 붙입니다.
+    *   **효과:** 이 과정으로 학습 데이터 크기가 정확히 **2배(Augmentation)**로 늘어납니다. 모델이 특정 기준 팀 순번(TeamID의 크고 작음에 따른 배열 오류)에 편향되지 않고 어떤 자리에 가도 완벽하게 좌우 대칭성을 인식해 중립적으로 판정할 수 있도록 유도합니다.
+    *   **최종 식별 변수명:** 생성된 데이터 행에는 구분을 위해 `Is_Augmented=1` 피처를 부여할 수 있게 만듭니다.
+*   **2. 연속형 데이터 가우시안 노이즈 (Gaussian Noise for Continuous Features)**:
+    *   **전처리 (Train 데이터 한정):** 모델의 과적합(Overfitting)을 억제하기 위해 승리에 영향을 미치는 `Possessions_Diff` 나 경기력 마진 관련 연속형 변수 공간에 정규분포 가우시안 노이즈(Gaussian Noise)를 미세하게 더해줍니다 (`NOISE_SCALE = 0.02 ~ 0.03` 혹은 `X + N(0, 0.02)`).
+    *   **효과:** 테스트 셋(미래 예측분)과 기존 OOF Validation이 다르게 나올 경우를 고려해 강건성(Robustness)을 부여합니다. 기존 원본 행과 노이즈가 기입된 추가 행으로 데이터셋 덩치를 한 번 더 부풀립니다.
+*   **3. Recency 가중치 (Recency Sample Weights 지수 감쇠)**:
+    *   **전처리 (Train 데이터 한정):** 오래전 데이터(예: 2008년도 매치업)와 최근 데이터(예: 2025년도)를 완전히 동등한 중요도로 트리 모델이 학습하지 못하게 만듭니다. 학습 대상 년도 역순으로 지수 감쇠(Decay) 계수 `w_tr = 0.60 ^ (max_season - Season)` 공식(혹은 비슷한 타임스탬프 비례)을 사용해 `weight` 값을 설정합니다.
+    *   **최종 식별 변수명:** `Sample_Weight` (LGBM, XGBoost 학습 fit 단계에서 sample_weight 파라미터로 넘겨줌)
+*   **4. 신경망(NN)용 Label Smoothing 적용 기법**:
+    *   **전처리 (Train 및 Stacking 단계):** 딥러닝 앙상블 추가 시 OOF Brier Score에 0과 1 근접 극단치 패널티를 덜 부과받기 위해. 확률을 부드럽게 변환시킵니다.
+    *   **공식 결합:** `y_smooth = y * 0.95 + 0.5 * 0.05`
 
 ---
 **추후 계획**: 위에서 제안한 새로운 파생 변수들의 전처리 로직(공식, 사용 피처 맵핑)을 Python 코드로 구현하여 기존 `T1 vs T2 Diff` 파이프라인에 병합할 예정입니다.
