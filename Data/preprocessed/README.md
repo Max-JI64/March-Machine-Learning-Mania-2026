@@ -52,6 +52,8 @@
 | **F. 과거 토너먼트 및 하위 대회 경험** | `past_tourney_features_[M/W].csv` | `Season`, `TeamID`, `Past_Tourney_eFG%`, `Past_Tourney_TOV%`, `Prev_Secondary_Tourney_Success` |
 | **G. 일정 및 대진표 기반 휴식 지표** | `schedule_rest_features_[M/W].csv` | `Season`, `TeamID`, `Days_Since_Last_Game` |
 | **H. 지리 정보 및 누적 피로도 지표** | `geography_travel_features_[M/W].csv` | `Season`, `TeamID`, `Lat`, `Lon`, `Home_Altitude`, `LateSeason_Altitude_Fatigue`, `LateSeason_Lon_Fatigue` |
+| **I. 자체 레이팅 (Advanced Ratings)** | `advanced_ratings_[M/W].csv` | `Season`, `TeamID`, `Elo`, `SRS`, `Expected_Seed`, `Power_Composite` |
+| **J. 데이터 증강 (Data Augmentation)** | *(별도 CSV 저장 없이 훈련 시 메모리 호출)* | `Is_Augmented`, 노이즈 추가된 `Diff` 스탯 등 |
 > **📌 [중요] 타겟 시즌(Target Season)과 제출 데이터의 개념 정리**
 > *   **학습용(Train) 데이터**: 2003년 ~ 2025년까지의 **과거 정규시즌 성적**과 **실제 토너먼트 경기 결과**를 맵핑한 데이터입니다. (예: 2018년 A팀 성적과 B팀 성적을 비교해서, 실제 2018년 토너먼트에서 누가 이겼는지 학습)
 > *   **제출용(Test) 데이터**: 현재 진행 중이거나 곧 시작될 **올해(예: 2026년)**의 토너먼트 전 경기 가상 대진표입니다.
@@ -260,6 +262,25 @@
 *   **시즌 막판 누적 시차/원정 피로도 (Late Season Lon & Travel Fatigue)**:
     *   **전처리:** 서부와 동부를 오가는 원정 스케줄은 선수들의 생체 리듬(Timezone)을 망가뜨립니다. 마지막 30일(DayNum 103~132) 동안 이동한 **순수 2D 거리**와 함께, 타임존의 변화를 대변하는 **경도 이동량(Longitude Change 절대값)**을 롤링 합산하여 수면 리듬이 깨진 채 토너먼트에 간신히 턱걸이한 팀을 식별합니다.
     *   **최종 생성 변수명:** `LateSeason_Lon_Fatigue_Diff`, `LateSeason_Travel_Fatigue_Diff`
+
+### I. 자체 레이팅 지표 (Advanced Ratings)
+*   **1. 세밀한 보정이 들어간 홈-원정 어드밴티지 Elo 레이팅 (Home-Adjusted Advanced Elo)**:
+    *   **전처리:** 단순 승패 기반 고정 K-Factor Elo가 아니라, **홈 코트 시에는 점수를 보정(예: +80~100)하여 기대승률수식(`We`)을 통제**하고, 경기의 점수 차(Margin) 기복에 따라 **Elo 변동폭 함수(`K-Factor`)에 가중치를 주는** 고급 피처입니다. 타 하위 포스트시즌(Secondary 투어리먼트) 대회의 전적까지 포함하며, 매 시즌 리셋되는 대신 작년 점수의 75%를 계승하는 Mean Reversion 방식을 취해 연속성을 부여합니다.
+    *   **최종 생성 변수명:** `Elo_Rating_Diff`, `Elo_WinProb_Neutral`
+*   **2. SRS (Simple Rating System) 선형대수학 강도 스코어 기반 가짜 스탯 판독기**:
+    *   **전처리:** 팀의 '득실 마진 배열'과 해당 팀들이 맞붙은 '상대 전적 네트워크 행렬'을 만들어, 파이썬 NumPy 선형 방정식(`np.linalg.solve`)을 수학적으로 풉니다. 이 방정식을 통해 "약팀 학살로 쌓은 가짜 마진"과 "강팀 원정에서 기록한 진짜 마진"을 분별할 수 있는 핵심 구조적 강도 스코어를 산출합니다.
+    *   **최종 생성 변수명:** `SRS_Diff`
+*   **3. 파워 랭킹 결합 및 기대 시드 (Power Composite & Expected Seed)**:
+    *   **전처리:** 위에서 구한 `Elo`, `SRS`, 그리고 `AdjNetRtg`, `WinPct_recent`, `Margin_recent` 피처들을 모두 Z-Score 정규화로 스케일링한 후, 각각 0.3, 0.2 등의 고정 계수 가중치를 두어 하나로 합칩니다. 이 **'Power Composite'** 점수를 바탕으로 전체 현존하는 68개 팀 내의 가상 등수를 매겨 **자체 기대 시드(Expected Seed)**를 역산해 부여합니다.
+    *   **최종 생성 변수명:** `Expected_Seed_Diff`, `Power_Composite_Diff`, `Actual_vs_Expected_Seed_Ratio`
+
+### J. 데이터베이스 증강 기법 (Data Augmentation) - 함수 호출 전용
+> 📌 **주의**: J 파트는 팀별 통계 CSV 파일(`advanced_ratings_[M/W].csv` 등)을 생성하는 것이 아닙니다. A~I 파트까지 생성된 피처들을 모아 **최종 학습용 매치업 데이터프레임(`train_df`)을 만들었을 때, 모델 학습 직전에 메모리 상에서만 데이터를 증폭(Augmentation)**하는 훈련 전용 함수 로직입니다. 
+
+*   **1. 연속형 데이터 가우시안 노이즈 (Gaussian Noise for Continuous Features)**:
+    *   **전처리 (Train 데이터 한정):** 승리에 영향을 미치는 `Possessions_Diff` 나 `WinRate` 같은 연속형 변수 공간에 정규분포 가우시안 노이즈(Gaussian Noise)를 더해줍니다 (`NOISE_SCALE = 0.03` 등). 오버피팅을 억제하며, 미세하게 확률적 변동성이 생긴 Train Set 위에서 트리 계열 모델들이 더 강건하게 테스트 데이터(Test)에서 생존하도록 튜닝하는 기법입니다.
+*   **2. 데이터 대칭 스왑 증강 (Data Swapping Augmentation) 처리**:
+    *   **전처리 (Train 데이터 한정):** T1이 T2를 이겼다(Label=1)는 것은 T2가 T1에게 졌다(Label=0)는 완벽한 대칭입니다. Train 데이터에서 T1과 T2의 순서를 강제로 모두 바꾼(Flip) 반전 데이터열을 만들고, Label을 `1 - Label`로 만들어 기존 Train Data에 1배수 더 복사(Concat)합니다. 이를 통해 모델이 특정 ID 순번에 편향되지 않고 방향성을 중립적으로 학습하며, 학습 데이터 개수가 총 2배(Augmentation)로 늘어납니다. 반전된 데이터 행에는 식별을 위해 `Is_Augmented=1` 피처를 부여합니다.
 
 ---
 **추후 계획**: 위에서 제안한 새로운 파생 변수들의 전처리 로직(공식, 사용 피처 맵핑)을 Python 코드로 구현하여 기존 `T1 vs T2 Diff` 파이프라인에 병합할 예정입니다.

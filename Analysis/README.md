@@ -33,23 +33,60 @@
 
 ---
 
-## 4. 학습 전략 (Training Strategy)
-*   **데이터 분할 (Data Splitting):**
-    *   과거 토너먼트 데이터를 연도별로 분할하여 Train/Validation 셋을 구성합니다. (예: 2022년 이전 데이터로 훈련, 2023~2024년 데이터로 검증)
-*   **남녀 모델 분리 학습 (Gender Separation):**
-    *   제출 양식에는 남성과 여성 팀이 서로 맞붙는 혼합 경기(Mixed Matchup)가 존재하지 않습니다.
-    *   따라서 남성(Men's) 데이터와 여성(Women's) 데이터를 완전히 분리하여 두 개의 독립된 모델로 학습시키고 각각 추론한 뒤, 마지막 제출 시에만 하나로 이어 붙여야(Concat) 합니다.
-*   **모델링 앙상블 (Modeling & Ensemble):**
-    *   **단일 모델의 한계 극복:** 예측 불확실성이 큰 스포츠 토너먼트 특성상, 단일 모델보다는 **LightGBM, XGBoost, CatBoost**와 같은 3대장 트리 기반 부스팅 모델을 앙상블(평균 등)하여 예측의 안정성을 도모하는 패턴이 강력하게 권장됩니다.
-    *   **지표 유의사항:** 기본 분류 알고리즘의 손실 함수(Log Loss 등)를 사용하더라도 검증 지표를 반드시 `MSE` 또는 `Brier Score`로 설정하여 Early Stopping 및 최적화를 적용해야 대회 룰에 온전히 부합합니다.
+## 4. 학습 전략 (Training Strategy): 점진적 모델 빌딩 (Progressive Modeling)
+단일 모델 완성부터 다중 앙상블, 그리고 신경망(MLP) 결합까지 단계별로 실험하여 어떤 데이터 조합이 가장 높은 성능(Brier Score 최소화)을 내는지 검증하는 **점진적 파이프라인(Progressive Pipeline)**을 구축합니다.
+
+### Step 1. 단일 베이스라인 모델 (Single Baseline Model)
+*   **목적:** 전처리된 데이터(`base_*, advanced_*`)의 기본적인 유효성을 검증하고 정상적으로 학습/평가가 이루어지는지 확인합니다.
+*   **교차 검증 분할 (Cross-Validation Strategy): 연도별 순차 분할(Rolling Holdout)**
+    *   대회의 특성(과거 데이터로 미래를 예측)상 K-Fold 랜덤 분할은 데이터 누수(Leakage) 및 시계열 특성 상실의 지름길입니다.
+    *   반드시 **연도(Season)를 기준**으로 쪼갭니다. 예컨대 최근 5년 치 예측력을 평균내어 모델의 진짜 성능(OOF)을 확인하는 구조를 취해야 합니다:
+        *   Fold 1 검증: (2003~2020년 데이터로 학습) 👉 **2021년 토너먼트 예측 및 채점**
+        *   Fold 2 검증: (2003~2021년 데이터로 학습) 👉 **2022년 토너먼트 예측 및 채점**
+        *   Fold 3 검증: (2003~2022년 데이터로 학습) 👉 **2023년 토너먼트 예측 및 채점**
+        *   Fold 4 검증: (2003~2023년 데이터로 학습) 👉 **2024년 토너먼트 예측 및 채점**
+        *   Fold 5 검증: (2003~2024년 데이터로 학습) 👉 **2025년 토너먼트 예측 및 채점**
+    *   위 5개 결과의 `Brier Score(MSE)` 평균값이 가장 낮은 모델/전처리 조합을 찾는 것이 파이프라인의 핵심입니다.
+*   **선택 알고리즘:** `LightGBM` (가장 빠르고 훌륭한 기본 성능) 또는 `Logistic Regression` (해석력이 좋고 안정적임).
+*   **주요 리소스:** `optuna`를 활용하여 단일 모델의 주요 하이퍼파라미터(max_depth, learning_rate 등)만 가볍게 튜닝합니다.
+
+### Step 2. 트리 기반 3대장 앙상블 (Tree-based 3-Model Ensemble)
+*   **목적:** 단일 트리의 과적합(Overfitting)을 방지하고, 각 알고리즘의 장점을 결합하여 분산을 줄입니다.
+*   **선택 알고리즘:** `LightGBM` + `XGBoost` + `CatBoost`
+*   **결합 방식:**
+    1.  **단순 평균 (Simple Average):** 예측된 확률값 3개를 더해 3으로 나눕니다. 가장 구현이 쉽고 베이스라인으로 강력합니다.
+    2.  **최적 가중치 평균 (Weighted Average):** `scipy.optimize.minimize` (주로 SLSQP 메서드)를 활용하여 Validation Set의 Brier Score를 최소화하는 각 모델별 최적의 가중치(예: LGBM 0.4, XGB 0.3, CAT 0.3)를 찾습니다.
+
+### Step 3. 메타 모델 가세 (5-Model Ensemble & Logistic Calibration)
+*   **목적:** 트리 모델들이 잡지 못하는 선형적 관계를 보완하고, 최종 확률값의 신뢰도(Calibration)를 대회 평가지표에 완벽히 맞춥니다.
+*   **추가 알고리즘:** `Logistic Regression` (강력한 L1/L2 정규화 포함) 추가.
+*   **자체 레이팅(Part I) 휴리스틱 추가:** 머신러닝 모델이 아닌, 수학적으로 도출된 `Elo_WinProb` (Elo 레이팅 기반 승률 예측치)를 5번째 독립적인 예측 모델처럼 취급하여 병합합니다.
+*   **결합 및 보정 방식:**
+    *   총 5개 결과물(LGBM, XGB, CAT, LR, Elo)을 최적 가중치로 앙상블(`blend_predictions`).
+    *   **Logistic Calibration (로지스틱 보정):** 앙상블된 최종 확률 예측값이 실제 0과 1 분포에 맞게 잘 스케일링 되었는지(overconfident하지 않은지) 확인하기 위해 `scipy.special.logit` 변환 후 다시 한번 1D Logistic Regression을 통과시켜 확률값을 세밀하게 깎아냅니다 (Calibration).
+
+### Step 4. 비선형 신경망 아키텍처 결합 (Adding MLP / Neural Nets)
+*   **목적:** 데이터가 풍부해지고 파생 변수(Diff, Ratio 등)의 복잡한 비선형 교차 작용을 탐지하기 위해 딥러닝 기법을 마지막에 스택킹합니다.
+*   **모델 구조 제안:**
+    *   `PyTorch`를 활용한 3-Layer MLP 깊은 앙상블 (예: `march-mania.ipynb` 참조).
+    *   범주형 변수(Seed Number, Conference Code 등)를 처리하기 위한 임베딩(Embedding) 레이어 + 연속형 변수를 처리하는 Dense 레이어 구조.
+*   **앙상블 방식 (Stacking):**
+    *   Step 3까지 만들어진 트리+선형 보정 모델들의 예측 결과치 값들 자체를 새로운 피처셋으로 삼고(Meta Features), 신경망 모델이 이를 입력받아 최종 최적화 확률을 내뿜도록 아키텍처를 구성합니다 (Deep Blending).
 
 ---
 
-## 5. 예측 및 제출 (Prediction & Submission)
+## 5. 남녀 모델 분리 학습 (Gender Separation) 시스템
+*   제출 양식에는 남성과 여성 팀이 서로 맞붙는 혼합 경기(Mixed Matchup)가 존재하지 않습니다.
+*   따라서 남성(Men's) 데이터와 여성(Women's) 데이터를 **완전히 분리하여 두 개의 독립된 파이프라인(Step 1 ~ 4)으로 학습**시킵니다.
+    *   여성 데이터는 상대적으로 이변(Upset)이 적고 상위 시드가 승리할 확률이 더 높게 나타나는 패턴이 있으므로, 하이퍼파라미터와 앙상블 가중치를 남성 모델과 별도로 도출해야 합니다.
+*   추론 후, `[M_Pred_DF, W_Pred_DF]`를 마지막 `submission.csv` 작성(Concat) 시점에만 하나로 이어 붙입니다.
+
+---
+
+## 6. 최종 예측 및 제출 (Prediction & Submission)
 2026년 대회가 실제로 개최되어 대진 예측을 할 때의 파이프라인입니다.
 
-1.  2026년 정규 시즌 성적을 바탕으로 출전한 모든 팀의 스탯을 갱신 및 계산.
-2.  `SampleSubmissionStage1.csv` 및 `SampleSubmissionStage2.csv`에 적힌 모든 가상 매치업(`ID: 2026_1101_1102`)을 가져옴.
-3.  매치업된 두 팀의 스탯 차이 Feature를 생성.
-4.  훈련된 모델에 통과시켜 각 매치업의 승리 예측 확률(Pred) 도출.
-5.  형식에 맞춰 제출(Submission) 파일 생성.
+1.  2026년 정규 시즌 성적을 바탕으로 완성된 [Step 1~4] 파이프라인 전처리 코드를 가동합니다.
+2.  `SampleSubmissionStage1.csv` (또는 Stage2)에 적힌 모든 가상 매치업(`ID: 2026_1101_1102`)을 읽어옵니다.
+3.  성별 식별자에 맞춰 남성 모델 / 여성 모델에 각각 통과시켜 승리 예측 확률(Pred)을 도출합니다.
+4.  지정된 형식(`ID`, `Pred`)에 맞춰 `submission.csv` 파일을 생성합니다. 무한대 감점을 막기 위해 Brier Score 최적화가 안 된 상태라면 예측값을 절대 0이나 1로 두지 않고 (예: `clip(0.001, 0.999)`) 안전 장치를 걸어둡니다.
