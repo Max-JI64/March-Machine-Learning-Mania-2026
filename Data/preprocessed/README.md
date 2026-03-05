@@ -45,15 +45,14 @@
 | 전처리 파트 (분야) | 생성될 CSV 파일명 | 저장될 주요 변수명 (Columns) |
 | :--- | :--- | :--- |
 | **A. 세부 박스스코어 기반 고도화 지표** | `advanced_stats_features_[M/W].csv` | `Season`, `TeamID`, `FGA`, `FGM`, `OR`, `DR`, `Ast`, `Stl`, `Blk`, `Possessions`, `eFG%`, `TS%`, `OR%`, `TOV%`, `FTRate`, `3PAr`, `OffRtg`, `DefRtg`, `AstTO_Ratio` |
-| **B. 후반기 기세 및 흐름 지표** | `momentum_form_features_[M/W].csv` | `Season`, `TeamID`, `Last14_WinRate`, `Last30_WinRate`, `Last14_Margin`, `Last30_eFG%`, `Last30_TOV%`, `Active_WinStreak`, `Last30_QualityWins` |
-| **C. 농구단 명성 및 누적 기세** | `program_pedigree_features_[M/W].csv` | `Season`, `TeamID`, `3Yr_Rank_Avg`, `Rank_Trend_Slope`, `Tourney_Exp_Score`, `Coach_Tenure`, `Coach_Career_WinRate`, `Coach_Tourney_Wins`, `Is_Rookie_Coach` |
-| **D. 컨퍼런스 및 스케쥴 강도 보정** | `sos_features_[M/W].csv` | `Season`, `TeamID`, `WinRate_vs_Top50`, `Non_Conf_SOS`, `Is_Major_Conf`, `Major_Conf_WinRate`, `Conf_Tourney_Wins` |
-| **E. Brier Score 타겟팅 지표** | `brier_score_features_[M/W].csv` | `Season`, `TeamID`, `Margin_Std`, `Close_Game_WinRate`, `Blowout_Wins_Count`, `Score_Max`, `Score_Std` |
-| **F. 과거 토너먼트 및 하위 대회 경험** | `past_tourney_features_[M/W].csv` | `Season`, `TeamID`, `Past_Tourney_eFG%`, `Past_Tourney_TOV%`, `Prev_Secondary_Tourney_Success` |
+| **B. 후반기 기세 및 흐름 지표** | `momentum_form_features_[M/W].csv` | `Season`, `TeamID`, `Last14_WinRate`, `Last30_WinRate`, `Last14_Margin`, `Last30_eFG%`, `Last30_TOV%`, `Active_WinStreak`, `Last30_QualityWins`, `Elo_Rating_Diff` |
+| **C. 농구단 명성 및 누적 기세** | `program_pedigree_features_[M/W].csv` | `Season`, `TeamID`, `3Yr_Rank_Avg`, `Rank_Trend_Slope`, `Tourney_Exp_Score`, `Coach_Tenure`, `Coach_Career_WinRate`, `Coach_Tourney_Wins`, `Is_Rookie_Coach`, `Expected_Seed`, `Power_Composite`, `CoachTWR_Diff` |
+| **D. 컨퍼런스 및 스케쥴 강도 보정** | `sos_features_[M/W].csv` | `Season`, `TeamID`, `WinRate_vs_Top50`, `Non_Conf_SOS`, `Is_Major_Conf`, `Major_Conf_WinRate`, `Conf_Tourney_Wins`, `SRS_Diff`, `MasMean_Diff` |
+| **E. Brier Score 타겟팅 지표** | `brier_score_features_[M/W].csv` | `Season`, `TeamID`, `Margin_Std`, `Close_Game_WinRate`, `Blowout_Wins_Count`, `Score_Max`, `Score_Std`, `Pyth_Diff` |
+| **F. 과거 토너먼트 및 하위 대회 경험** | `past_tourney_features_[M/W].csv` | `Season`, `TeamID`, `Past_Tourney_eFG%`, `Past_Tourney_TOV%`, `Prev_Secondary_Tourney_Success`, `H2H_WinRate`, `TourneyApps_Diff` |
 | **G. 일정 및 대진표 기반 휴식 지표** | `schedule_rest_features_[M/W].csv` | `Season`, `TeamID`, `Days_Since_Last_Game` |
 | **H. 지리 정보 및 누적 피로도 지표** | `geography_travel_features_[M/W].csv` | `Season`, `TeamID`, `Lat`, `Lon`, `Home_Altitude`, `LateSeason_Altitude_Fatigue`, `LateSeason_Lon_Fatigue` |
-| **I. 자체 레이팅 (Advanced Ratings)** | `advanced_ratings_[M/W].csv` | `Season`, `TeamID`, `Elo`, `SRS`, `Expected_Seed`, `Power_Composite` |
-| **J. 데이터 증강 (Data Augmentation)** | *(별도 CSV 저장 없이 훈련 시 메모리 호출)* | `Is_Augmented`, 노이즈 추가된 `Diff` 스탯 등 |
+| **I. 데이터 증강 (Data Augmentation)** | *(별도 CSV 저장 없이 훈련 시 메모리 호출)* | `Is_Augmented`, 노이즈 추가된 `Diff` 스탯 등 |
 > **📌 [중요] 타겟 시즌(Target Season)과 제출 데이터의 개념 정리**
 > *   **학습용(Train) 데이터**: 2003년 ~ 2025년까지의 **과거 정규시즌 성적**과 **실제 토너먼트 경기 결과**를 맵핑한 데이터입니다. (예: 2018년 A팀 성적과 B팀 성적을 비교해서, 실제 2018년 토너먼트에서 누가 이겼는지 학습)
 > *   **제출용(Test) 데이터**: 현재 진행 중이거나 곧 시작될 **올해(예: 2026년)**의 토너먼트 전 경기 가상 대진표입니다.
@@ -142,6 +141,9 @@
     *   **원본 변수:** `DayNum`, `WTeamID`, `LTeamID`, `MMasseyOrdinals` 순위 데이터
     *   **전처리:** 단순히 '50위 이내인가?' 범주형 카운트 외에, 추가로 **"승리한 경기 당일 기준, 상대 팀의 랭킹과 우리 팀의 랭킹 차이(`My_Rank - Opp_Rank`)"** 변수를 별개의 피처로 추가합니다. 나보다 랭킹이 훨씬 높은 강팀을 잡아낸 경기일수록 기세(Momentum)에 더 큰 가중치를 부여하기 위함입니다.
     *   **최종 생성 변수명:** `Upset_Value_Diff`
+*   **[NEW: 기존 I 파트(자체 레이팅)에서 이동] 세밀한 보정이 들어간 홈-원정 어드밴티지 Elo 레이팅 (Home-Adjusted Advanced Elo)**:
+    *   **전처리:** 단순 승패 기반 고정 K-Factor Elo가 아니라, **홈 코트 시에는 점수를 보정(예: +75~100)하여 기대승률수식(`We`)을 통제**하고, 경기의 점수 차(Margin) 기복에 따라 **Elo 변동폭 함수(`K-Factor`)에 가중치를 주는** 고급 피처입니다. 타 하위 포스트시즌(Secondary 투어리먼트) 대회의 전적까지 모두 포함하며, 매 시즌 리셋되는 대신 작년 점수의 평균 75%를 계승하는 평균 회귀(Mean Reversion) 방식을 취해 연속성을 부여합니다.
+    *   **최종 생성 변수명:** `Elo_Rating_Diff`, `Elo_WinProb_Neutral`, `T1_EloEndSeason`, `T2_EloEndSeason`, `T1_EloPreTourney`, `T2_EloPreTourney`, `IX_Elo_x_Seed`, `IX_Elo_x_Net`
 
 ### C. 농구단 명성 및 누적 기세 (Program Pedigree & Historic Trajectory)
 선수진은 매년 바뀌더라도 명문 대학(우수 감독, 리크루팅, 시스템)의 전력이나 누적된 큰 경기 경험치는 현재 성적에 영향을 줍니다. 한 해 반짝 잘하는 팀인지, 뼈대 있는 명문인지를 구분하기 위해 이전 3~5개 시즌에 걸친 시계열 지표를 도입합니다.
@@ -174,6 +176,12 @@
 *   **1라운드 이변 특화 DNA (First Round Upset DNA)**:
     *   **전처리:** 특정 대학(Team)이나 감독(Coach)이 과거 토너먼트 **1라운드(Round of 64)**에서 강팀(예: 1~4번 시드)을 상대로 업셋(Upset)을 일으킨 횟수나 승률을 별도로 집계합니다. 토너먼트 전체 경험치(`Tourney_Exp_Score`)와 달리, 이 변수는 "광기의 3월(March Madness)" 초반 특유의 이변 발생 확률을 캡처하는 데 특화됩니다.
     *   **최종 생성 변수명:** `First_Round_Upset_Rate_Diff`
+*   **[NEW: 기존 I 파트(자체 레이팅)에서 이동] 파워 랭킹 결합 및 기대 시드 (Power Composite & Expected Seed)**:
+    *   **전처리:** 위에서 구한 `Elo`, `SRS`, 그리고 `AdjNetRtg`, `WinPct_recent`, `Margin_recent` 피처들을 모두 Z-Score 정규화로 스케일링한 후, 각각 0.3, 0.2 등의 고정 계수 가중치를 두어 하나로 합칩니다. 이 **'Power Composite'** 점수를 바탕으로 전체 현존하는 68개 팀 내의 가상 등수를 매겨 **자체 기대 시드(Expected Seed)**를 역산해 부여합니다.
+    *   **최종 생성 변수명:** `Expected_Seed_Diff`, `Power_Composite_Diff`, `Actual_vs_Expected_Seed_Ratio`, `T1_ExpectedSeed`, `T2_ExpectedSeed`
+*   **[NEW: 기존 I 파트(자체 레이팅)에서 이동] 감독 토너먼트 승률 (Coach Tournament Records)**:
+    *   **전처리:** 현재 시즌까지 해당 감독(Coach)의 역대 토너먼트 종합 누적 승/패를 1차원적으로 합산 계산하여 토너먼트 무대 승률을 생성합니다 (초보나 정보 부재 감독은 0.5 중립처리).
+    *   **최종 생성 변수명:** `CoachTWR_Diff`, `T1_CoachTWR`, `T2_CoachTWR`
 
 ### D. 컨퍼런스 및 스케쥴 강도 보정 (Strength of Schedule)
 **사용 데이터:** `MMasseyOrdinals.csv` (남자), `MTeamConferences.csv`, `WTeamConferences.csv`
@@ -197,6 +205,12 @@
     *   **사용 데이터:** `MConferenceTourneyGames.csv`, `WConferenceTourneyGames.csv`
     *   **전처리:** 정규시즌 마감 직후, 본선 진출권을 따내기 위해 치러지는 '컨퍼런스 토너먼트'에서의 폼을 측정합니다. 여기서 결승까지 가거나 우승을 차지한 팀(Automatic Bid)은 그 기세가 이어져 본선(NCAA 토너먼트)에서도 좋은 성적을 낼 확률이 높습니다. '최근 치른 컨퍼런스 토너먼트 승수'를 카운트합니다.
     *   **최종 생성 변수명:** `Conf_Tourney_Wins_Diff`
+*   **[NEW: 기존 I 파트(자체 레이팅)에서 이동] SRS (Simple Rating System) 선형대수학 강도 스코어 기반 가짜 스탯 판독기**:
+    *   **전처리:** 팀의 '득실 마진 배열'과 해당 팀들이 맞붙은 '상대 전적 네트워크 행렬'을 만들어, 파이썬 NumPy 선형 방정식(`np.linalg.solve`)을 수학적으로 풉니다. 이 방정식을 통해 "약팀 학살로 쌓은 가짜 마진"과 "강팀 원정에서 기록한 진짜 마진"을 분별할 수 있는 핵심 구조적 강도 스코어를 산출합니다.
+    *   **최종 생성 변수명:** `SRS_Diff`, `T1_SRS_recent`, `T2_SRS_recent`
+*   **[NEW: 기존 I 파트(자체 레이팅)에서 이동] 기계학습/외부 Massey Ordinals 통합 랭킹 지표**:
+    *   **전처리:** POM, SAG, MOR, COL 등 7~8개 주요 컴퓨터 랭킹 시스템을 선별하여, 각 시스템별 시즌 마지막 날짜의 `OrdinalRank`를 가져와 0~1 사이의 백분위 또는 Z-스코어로 변환합니다. 변환된 순위의 평균치, 최저치, 중앙값 및 여러 랭킹 시스템 간의 불일치성(일관성)을 잴 수 있는 **표준편차(MasStd)**를 구합니다.
+    *   **최종 생성 변수명:** `MasMean_Diff`, `MasMin_Diff`, `MasStd_Diff`, `MasPOM_Diff`, `MasSAG_Diff`, `Massey_x_Elo`
 
 ### E. ★ Brier Score 타겟팅 지표 (Probability & Variance) ★
 **사용 데이터:** `MRegularSeasonCompactResults.csv`, `WRegularSeasonCompactResults.csv`
@@ -216,6 +230,9 @@
 *   **득점의 기복 및 폭발력 (Score Variance & Max potential)**:
     *   **전처리:** 단순히 팀의 '평균 득점'만 보지 않고, 정규시즌 득점 배열에서 **최대 득점(Max)** 또는 당일 슈팅감에 크게 의존하는 팀인지 확인하기 위해 **득점의 표준편차(Score Std Dev)**를 봅니다. 폭발력이 높은 팀은 강팀을 잡을 가능성도, 약팀에게 잡힐 가능성도 높다는 뜻이므로 Brier Score 예측 시 확률을 0 극단으로 몰아주지 못하게 하는 억제기 역할을 합니다.
     *   **최종 생성 변수명:** `Score_Max_Diff`, `Score_Std_Diff`
+*   **[NEW: 기존 I 파트(자체 레이팅)에서 이동] 빌 제임스 피타고리안 기댓값 (Pythagorean Expectation) 및 시드 교호작용**:
+    *   **전처리:** 득점 비율(`AvgScore^11.5 / (AvgScore^11.5 + AvgAllow^11.5)`)에서 나오는 순수 승리 확률을 도출합니다. 또한, 자체 레이팅(Elo/Net Rating)과 실제 배치된 '토너먼트 시드' 사이의 차이 혹은 곱(`Interaction`)을 통해, 실제 실력은 좋은데 억울하게 낮은 시드를 받은 "업셋(Upset)" 기대 팀을 모델이 찾아내도록 돕습니다.
+    *   **최종 생성 변수명:** `Pyth_Diff`, `IX_Seed_x_Pyth`, `SeedWinProb`, `UpsetScore`, `HotnessScore`
 
 > **🚨 [치명적 주의사항: Data Leakage 및 미래 데이터 참조 금지]**
 > *   과거 캐글 대회의 가장 흔한 실수이자, **이 파이프라인에서 절대 추가해서는 안 되는 기획**: "토너먼트 1라운드(64강) 성적을 바탕으로 2라운드(32강) 결과를 예측하는 변수".
@@ -235,6 +252,12 @@
     *   **원본 변수:** 직전 1~2개 시즌의 `*SecondaryTourneyCompactResults.csv`
     *   **전처리:** 작년에 NCAA 메인 토너먼트에 진출하지 못해 NIT, CBI 등 하위 포스트시즌 대회에 나갔던 팀 중 우승이나 4강 등 딥런(Deep Run)을 기록한 경우 가중치를 부여합니다. 이러한 팀들은 다음 해 메인 토너먼트에서 이변을 일으키는 경우가 잦습니다.
     *   **최종 생성 변수명:** `Prev_Secondary_Tourney_Success_Diff`
+*   **[NEW: 기존 I 파트(자체 레이팅)에서 이동] H2H 상대 전적 확률 축소 (Bayesian Head-to-Head)**:
+    *   **전처리:** T1과 T2 간 역대 포스트시즌(토너먼트) 맞대결이 존재한다면 과거 승률을 산출하되, 표본이 1~2개 밖에 없는 경우의 극단값 과적합을 방지하기 위해 `사전 확률(0.5)`과 가상 3경기 분량을 섞어 베이지안 축소 변수를 생성합니다.
+    *   **최종 생성 변수명:** `H2H_WinRate`, `H2H_Games`
+*   **[NEW: 기존 I 파트(자체 레이팅)에서 이동] 토너먼트 경험 6년 누적 지표 (Tournament Experience)**:
+    *   **전처리:** 최근 6개 연도 동안 각 팀이 토너먼트에 얼마나 자주 출전했는지, 평균 몇 승을 올렸는지, 16강 이상의 딥런(`DeepRunRate`)을 했는지를 누적 계산하여 수치화시킵니다.
+    *   **최종 생성 변수명:** `TourneyApps_Diff`, `TourneyWPG_Diff`, `DeepRunRate_Diff`, `SeedAvg_Diff`
 
 ### G. 일정 및 대진표 기반 휴식 지표 (Schedule & Rest Advantage)
 **사용 데이터:** `*Seasons.csv`, 경기 날짜 정보(`DayNum`)
@@ -263,50 +286,10 @@
     *   **전처리:** 서부와 동부를 오가는 원정 스케줄은 선수들의 생체 리듬(Timezone)을 망가뜨립니다. 마지막 30일(DayNum 103~132) 동안 이동한 **순수 2D 거리**와 함께, 타임존의 변화를 대변하는 **경도 이동량(Longitude Change 절대값)**을 롤링 합산하여 수면 리듬이 깨진 채 토너먼트에 간신히 턱걸이한 팀을 식별합니다.
     *   **최종 생성 변수명:** `LateSeason_Lon_Fatigue_Diff`, `LateSeason_Travel_Fatigue_Diff`
 
-### I. 자체 레이팅 지표 (Advanced Ratings)
-> **중요 가이드라인**: 기존 A~H 파트 분류에 속하지 않거나 복합적으로 생성된 모든 새로운 외부 랭킹 및 자체 알고리즘 파생 변수들은 이 섹션에서 취합하여 관리합니다.
+### I. 데이터베이스 증강 기법 (Data Augmentation) - 함수 호출 전용
+> 📌 **주의**: I 파트는 팀별 통계 CSV 파일을 생성하는 것이 아닙니다. A~H 파트까지 생성된 피처들을 모아 **최종 학습용 매치업 데이터프레임(`train_df`)을 만들었을 때, 모델 학습 직전에 메모리 상에서만 데이터를 증폭(Augmentation)**하는 훈련 전용 함수 로직입니다. 
 
-**사용 데이터:** 
-- `MRegularSeasonCompactResults.csv`, `WRegularSeasonCompactResults.csv`
-- `MNCAATourneyCompactResults.csv`, `WNCAATourneyCompactResults.csv`
-- `MRegularSeasonDetailedResults.csv`, `WRegularSeasonDetailedResults.csv`
-- `*SecondaryTourneyCompactResults.csv`
-- `MMasseyOrdinals.csv` (남성만)
-- `MTeamCoaches.csv` (감독 토너먼트 기록, 남성만)
-- `MNCAATourneySeeds.csv`, `WNCAATourneySeeds.csv`
-- `MTeamConferences.csv`, `WTeamConferences.csv`
-
-**주요 파생 변수 및 전처리 방법 (Feature Engineering):**
-
-*   **1. 세밀한 보정이 들어간 홈-원정 어드밴티지 Elo 레이팅 (Home-Adjusted Advanced Elo)**:
-    *   **전처리:** 단순 승패 기반 고정 K-Factor Elo가 아니라, **홈 코트 시에는 점수를 보정(예: +75~100)하여 기대승률수식(`We`)을 통제**하고, 경기의 점수 차(Margin) 기복에 따라 **Elo 변동폭 함수(`K-Factor`)에 가중치를 주는** 고급 피처입니다. 타 하위 포스트시즌(Secondary 투어리먼트) 대회의 전적까지 모두 포함하며, 매 시즌 리셋되는 대신 작년 점수의 평균 75%를 계승하는 평균 회귀(Mean Reversion) 방식을 취해 연속성을 부여합니다.
-    *   **최종 생성 변수명:** `Elo_Rating_Diff`, `Elo_WinProb_Neutral`, `T1_EloEndSeason`, `T2_EloEndSeason`, `T1_EloPreTourney`, `T2_EloPreTourney`, `IX_Elo_x_Seed`, `IX_Elo_x_Net`
-*   **2. SRS (Simple Rating System) 선형대수학 강도 스코어 기반 가짜 스탯 판독기**:
-    *   **전처리:** 팀의 '득실 마진 배열'과 해당 팀들이 맞붙은 '상대 전적 네트워크 행렬'을 만들어, 파이썬 NumPy 선형 방정식(`np.linalg.solve`)을 수학적으로 풉니다. 이 방정식을 통해 "약팀 학살로 쌓은 가짜 마진"과 "강팀 원정에서 기록한 진짜 마진"을 분별할 수 있는 핵심 구조적 강도 스코어를 산출합니다.
-    *   **최종 생성 변수명:** `SRS_Diff`, `T1_SRS_recent`, `T2_SRS_recent`
-*   **3. 파워 랭킹 결합 및 기대 시드 (Power Composite & Expected Seed)**:
-    *   **전처리:** 위에서 구한 `Elo`, `SRS`, 그리고 `AdjNetRtg`, `WinPct_recent`, `Margin_recent` 피처들을 모두 Z-Score 정규화로 스케일링한 후, 각각 0.3, 0.2 등의 고정 계수 가중치를 두어 하나로 합칩니다. 이 **'Power Composite'** 점수를 바탕으로 전체 현존하는 68개 팀 내의 가상 등수를 매겨 **자체 기대 시드(Expected Seed)**를 역산해 부여합니다.
-    *   **최종 생성 변수명:** `Expected_Seed_Diff`, `Power_Composite_Diff`, `Actual_vs_Expected_Seed_Ratio`, `T1_ExpectedSeed`, `T2_ExpectedSeed`
-*   **4. 기계학습/외부 Massey Ordinals 통합 랭킹 지표**:
-    *   **전처리:** POM, SAG, MOR, COL 등 7~8개 주요 컴퓨터 랭킹 시스템을 선별하여, 각 시스템별 시즌 마지막 날짜의 `OrdinalRank`를 가져와 0~1 사이의 백분위 또는 Z-스코어로 변환합니다. 변환된 순위의 평균치, 최저치, 중앙값 및 여러 랭킹 시스템 간의 불일치성(일관성)을 잴 수 있는 **표준편차(MasStd)**를 구합니다.
-    *   **최종 생성 변수명:** `MasMean_Diff`, `MasMin_Diff`, `MasStd_Diff`, `MasPOM_Diff`, `MasSAG_Diff`, `Massey_x_Elo`
-*   **5. 빌 제임스 피타고리안 기댓값 (Pythagorean Expectation) 및 시드 교호작용**:
-    *   **전처리:** 득점 비율(`AvgScore^11.5 / (AvgScore^11.5 + AvgAllow^11.5)`)에서 나오는 순수 승리 확률을 도출합니다. 또한, 자체 레이팅(Elo/Net Rating)과 실제 배치된 '토너먼트 시드' 사이의 차이 혹은 곱(`Interaction`)을 통해, 실제 실력은 좋은데 억울하게 낮은 시드를 받은 "업셋(Upset)" 기대 팀을 모델이 찾아내도록 돕습니다.
-    *   **최종 생성 변수명:** `Pyth_Diff`, `IX_Seed_x_Pyth`, `SeedWinProb`, `UpsetScore`, `HotnessScore`
-*   **6. 감독 토너먼트 승률 (Coach Tournament Records)**:
-    *   **전처리:** 현재 시즌까지 해당 감독(Coach)의 역대 토너먼트 종합 누적 승/패를 1차원적으로 합산 계산하여 토너먼트 무대 승률을 생성합니다 (초보나 정보 부재 감독은 0.5 중립처리).
-    *   **최종 생성 변수명:** `CoachTWR_Diff`, `T1_CoachTWR`, `T2_CoachTWR`
-*   **7. H2H 상대 전적 확률 축소 (Bayesian Head-to-Head)**:
-    *   **전처리:** T1과 T2 간 역대 포스트시즌(토너먼트) 맞대결이 존재한다면 과거 승률을 산출하되, 표본이 1~2개 밖에 없는 경우의 극단값 과적합을 방지하기 위해 `사전 확률(0.5)`과 가상 3경기 분량을 섞어 베이지안 축소 변수를 생성합니다.
-    *   **최종 생성 변수명:** `H2H_WinRate`, `H2H_Games`
-*   **8. 토너먼트 경험 6년 누적 지표 (Tournament Experience)**:
-    *   **전처리:** 최근 6개 연도 동안 각 팀이 토너먼트에 얼마나 자주 출전했는지, 평균 몇 승을 올렸는지, 16강 이상의 딥런(`DeepRunRate`)을 했는지를 누적 계산하여 수치화시킵니다.
-    *   **최종 생성 변수명:** `TourneyApps_Diff`, `TourneyWPG_Diff`, `DeepRunRate_Diff`, `SeedAvg_Diff`
-
-### J. 데이터베이스 증강 기법 (Data Augmentation) - 함수 호출 전용
-> 📌 **주의**: J 파트는 팀별 통계 CSV 파일(`advanced_ratings_[M/W].csv` 등)을 생성하는 것이 아닙니다. A~I 파트까지 생성된 피처들을 모아 **최종 학습용 매치업 데이터프레임(`train_df`)을 만들었을 때, 모델 학습 직전에 메모리 상에서만 데이터를 증폭(Augmentation)**하는 훈련 전용 함수 로직입니다. 
-
-**사용 데이터:** 학습용 기반 매치업 풀 세트 (정규시즌/토너먼트/하위 포스트시즌 결과 등 A~I 파트를 통해 완성된 매치업 140~300개 피처의 배열)
+**사용 데이터:** 학습용 기반 매치업 풀 세트 (정규시즌/토너먼트/하위 포스트시즌 결과 등 A~H 파트를 통해 완성된 매치업 140~300개 피처의 배열)
 
 *   **1. 데이터 대칭 스왑 증강 (Symmetric Data Swapping Augmentation) 처리**:
     *   **전처리 (Train 데이터 한정):** T1이 T2를 이겼다(Label=1)는 것은 T2가 T1에게 졌다(Label=0)는 완벽한 대칭입니다. Train 데이터에서 T1-T2 관련 열(`T1_` ↔ `T2_` 교체, 차이값인 `_Diff`의 부호 반전 `-Diff`)의 순서를 강제로 모두 바꾼(Flip) 반전 데이터열을 만들고, `Label = 1 - Label`로 만들어 기존 Train Data에 1배수 더 복사(Concat)하여 이어 붙입니다.
