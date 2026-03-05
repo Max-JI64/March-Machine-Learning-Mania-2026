@@ -44,14 +44,14 @@
 
 | 전처리 파트 (분야) | 생성될 CSV 파일명 | 저장될 주요 변수명 (Columns) |
 | :--- | :--- | :--- |
-| **A. 세부 박스스코어 기반 고도화 지표** | `advanced_stats_features.csv` | `Season`, `TeamID`, `FGA`, `FGM`, `OR`, `DR`, `Ast`, `Stl`, `Blk`, `Possessions`, `eFG%`, `TS%`, `OR%`, `TOV%`, `FTRate`, `3PAr`, `OffRtg`, `DefRtg`, `AstTO_Ratio` |
-| **B. 후반기 기세 및 흐름 지표** | `momentum_form_features.csv` | `Season`, `TeamID`, `Last14_WinRate`, `Last30_WinRate`, `Last14_Margin`, `Last30_eFG%`, `Last30_TOV%`, `Active_WinStreak`, `Last30_QualityWins` |
-| **C. 농구단 명성 및 누적 기세** | `program_pedigree_features.csv` | `Season`, `TeamID`, `3Yr_Rank_Avg`, `Rank_Trend_Slope`, `Tourney_Exp_Score`, `Coach_Tenure`, `Coach_Career_WinRate`, `Coach_Tourney_Wins`, `Is_Rookie_Coach` |
-| **D. 컨퍼런스 및 스케쥴 강도 보정** | `sos_features.csv` | `Season`, `TeamID`, `WinRate_vs_Top50`, `Non_Conf_SOS`, `Is_Major_Conf`, `Major_Conf_WinRate`, `Conf_Tourney_Wins` |
-| **E. Brier Score 타겟팅 지표** | `brier_score_features.csv` | `Season`, `TeamID`, `Margin_Std`, `Close_Game_WinRate`, `Blowout_Wins_Count`, `Score_Max`, `Score_Std` |
-| **F. 과거 토너먼트 및 하위 대회 경험** | `past_tourney_features.csv` | `Season`, `TeamID`, `Past_Tourney_eFG%`, `Past_Tourney_TOV%`, `Prev_Secondary_Tourney_Success` |
-| **G. 일정 및 대진표 기반 휴식 지표** | `schedule_rest_features.csv` | `Season`, `TeamID`, `Days_Since_Last_Game` |
-
+| **A. 세부 박스스코어 기반 고도화 지표** | `advanced_stats_features_[M/W].csv` | `Season`, `TeamID`, `FGA`, `FGM`, `OR`, `DR`, `Ast`, `Stl`, `Blk`, `Possessions`, `eFG%`, `TS%`, `OR%`, `TOV%`, `FTRate`, `3PAr`, `OffRtg`, `DefRtg`, `AstTO_Ratio` |
+| **B. 후반기 기세 및 흐름 지표** | `momentum_form_features_[M/W].csv` | `Season`, `TeamID`, `Last14_WinRate`, `Last30_WinRate`, `Last14_Margin`, `Last30_eFG%`, `Last30_TOV%`, `Active_WinStreak`, `Last30_QualityWins` |
+| **C. 농구단 명성 및 누적 기세** | `program_pedigree_features_[M/W].csv` | `Season`, `TeamID`, `3Yr_Rank_Avg`, `Rank_Trend_Slope`, `Tourney_Exp_Score`, `Coach_Tenure`, `Coach_Career_WinRate`, `Coach_Tourney_Wins`, `Is_Rookie_Coach` |
+| **D. 컨퍼런스 및 스케쥴 강도 보정** | `sos_features_[M/W].csv` | `Season`, `TeamID`, `WinRate_vs_Top50`, `Non_Conf_SOS`, `Is_Major_Conf`, `Major_Conf_WinRate`, `Conf_Tourney_Wins` |
+| **E. Brier Score 타겟팅 지표** | `brier_score_features_[M/W].csv` | `Season`, `TeamID`, `Margin_Std`, `Close_Game_WinRate`, `Blowout_Wins_Count`, `Score_Max`, `Score_Std` |
+| **F. 과거 토너먼트 및 하위 대회 경험** | `past_tourney_features_[M/W].csv` | `Season`, `TeamID`, `Past_Tourney_eFG%`, `Past_Tourney_TOV%`, `Prev_Secondary_Tourney_Success` |
+| **G. 일정 및 대진표 기반 휴식 지표** | `schedule_rest_features_[M/W].csv` | `Season`, `TeamID`, `Days_Since_Last_Game` |
+| **H. 지리 정보 및 누적 피로도 지표** | `geography_travel_features_[M/W].csv` | `Season`, `TeamID`, `Lat`, `Lon`, `Home_Altitude`, `LateSeason_Altitude_Fatigue`, `LateSeason_Lon_Fatigue` |
 > **📌 [중요] 타겟 시즌(Target Season)과 제출 데이터의 개념 정리**
 > *   **학습용(Train) 데이터**: 2003년 ~ 2025년까지의 **과거 정규시즌 성적**과 **실제 토너먼트 경기 결과**를 맵핑한 데이터입니다. (예: 2018년 A팀 성적과 B팀 성적을 비교해서, 실제 2018년 토너먼트에서 누가 이겼는지 학습)
 > *   **제출용(Test) 데이터**: 현재 진행 중이거나 곧 시작될 **올해(예: 2026년)**의 토너먼트 전 경기 가상 대진표입니다.
@@ -242,6 +242,24 @@
     *   **원본 변수:** `Seasons.csv`의 `DayZero`, 각 정규시즌/컨퍼런스 토너먼트의 마지막 경기 `DayNum`
     *   **전처리:** 정규시즌 종료 혹은 컨퍼런스 토너먼트 탈락 날짜부터 NCAA 토너먼트 1라운드 시작일 사이에 **며칠을 쉬었는지**(`Days_Since_Last_Game`)를 계산합니다. 체력 회복과 경기 감각 저하 사이의 밸런스를 측정하는 지표로 활용할 수 있습니다.
     *   **최종 생성 변수명:** `Days_Since_Last_Game_Diff`
+
+### H. 지리 정보 및 누적 피로도 지표 (Geography & Travel)
+**사용 데이터:** `Cities.csv`, `*GameCities.csv`, 외부 학교별 좌표/고도 데이터
+
+대회 제출 규정 상 어떤 팀끼리 만날지에 대한 "모든 가능한 가상 매치업"을 예측해야 하므로 **해당 가상 토너먼트 경기가 실제로 어느 도시에서, 몇 라운드에 열릴지 테스트 시점에는 알 수 없습니다.** 따라서 토너먼트 당일의 이동 거리나 대진표 난이도보다는, 정규시즌 동안 누적된 피로도와 팀 고유의 지리적 체력 특성을 추출하는 데 집중합니다.
+
+*   **시즌 막판 고도 충격량 (Late Season Altitude Fatigue_Score)**:
+    *   **전처리:** 고도의 급격한 변화(오르락내리락)는 비행 거리에 관계없이 선수들에게 엄청난 피로와 멀미를 유발합니다. 정규시즌 마지막 30일 동안 [내 홈구장 ↔ 원정 구장 1 ↔ 원정 구장 2 ↔ 내 홈구장]을 오갈 때 겪은 고도 격차의 절대값(`abs(Alt_diff)`)을 모두 누적 합산합니다.
+    *   **최종 생성 변수명:** `LateSeason_Altitude_Fatigue_Diff`
+*   **고산지대 생존 경험치 (Season High Altitude Experience)**:
+    *   **전처리:** 정규시즌 동안 자신의 평소 홈구장 고도보다 현저히 높은(예: +1000m 이상) 고산지대 원정 구장에서 경기를 치르고 **승리한 경험(Experience / WinRate)**을 수치화합니다. 고지대 산소 부족 환경을 버텨낸 팀은 토너먼트에서 어떤 구장이 배정되어도 환경 변화에 흔들리지 않습니다. (정규시즌엔 `*GameCities.csv`를 통해 경기장 좌표를 알 수 있으므로 모델 타겟팅 가능)
+    *   **최종 생성 변수명:** `High_Alt_WinRate_Diff`
+*   **순수 홈 고도 격차 및 기후/지역 특성 (Home Geo & Altitude Advantage)**:
+    *   **전처리:** 로키산맥 출신 팀과 해수면 출신 팀은 중립이나 원정 등 어디서 만나든 근본적인 심폐 지구력과 체력 회복 속도의 차이가 있습니다. 또한, 대학 농구 특성상 듀크, 캔자스 등 전통적인 강세 지역(Hotspot)의 인프라가 승률에 영향을 줍니다. 따라서 각 팀 캠퍼스의 **고도(Altitude)** 차이뿐만 아니라, **절대 위도(Lat)와 경도(Lon)** 수치 자체를 피처에 그대로 투입하여 트리 모델이 미국 내 지역적 강세를 스스로 파악하게 돕습니다. (단, 경기장 위치를 모르는 대회 특성상 T1과 T2의 위경도 차이(`Diff`)는 시차 계산의 노이즈가 될 수 있어 제외하고 절대 좌표만 넣습니다.)
+    *   **최종 생성 변수명:** `Home_Altitude_Diff`, `T1_Lat`, `T1_Lon`, `T2_Lat`, `T2_Lon`
+*   **시즌 막판 누적 시차/원정 피로도 (Late Season Lon & Travel Fatigue)**:
+    *   **전처리:** 서부와 동부를 오가는 원정 스케줄은 선수들의 생체 리듬(Timezone)을 망가뜨립니다. 마지막 30일(DayNum 103~132) 동안 이동한 **순수 2D 거리**와 함께, 타임존의 변화를 대변하는 **경도 이동량(Longitude Change 절대값)**을 롤링 합산하여 수면 리듬이 깨진 채 토너먼트에 간신히 턱걸이한 팀을 식별합니다.
+    *   **최종 생성 변수명:** `LateSeason_Lon_Fatigue_Diff`, `LateSeason_Travel_Fatigue_Diff`
 
 ---
 **추후 계획**: 위에서 제안한 새로운 파생 변수들의 전처리 로직(공식, 사용 피처 맵핑)을 Python 코드로 구현하여 기존 `T1 vs T2 Diff` 파이프라인에 병합할 예정입니다.
