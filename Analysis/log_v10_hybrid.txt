@@ -1,0 +1,23 @@
+🚀 V10: Hybrid Ensemble (CatBoost + NN) & Isotonic Calibration
+
+🚀 Fold별 학습 및 OOF 예측 수집...
+| 2013 | Cat: 0.1717 | NN: 0.2247 | SimpleBlend: 0.1818 |
+| 2014 | Cat: 0.1702 | NN: 0.2173 | SimpleBlend: 0.1820 |
+| 2015 | Cat: 0.1403 | NN: 0.1866 | SimpleBlend: 0.1479 |
+| 2016 | Cat: 0.1788 | NN: 0.2125 | SimpleBlend: 0.1852 |
+| 2017 | Cat: 0.1460 | NN: 0.1801 | SimpleBlend: 0.1490 |
+| 2018 | Cat: 0.1736 | NN: 0.2636 | SimpleBlend: 0.2021 |
+| 2019 | Cat: 0.1649 | NN: 0.1999 | SimpleBlend: 0.1716 |
+| 2021 | Cat: 0.1595 | NN: 0.1826 | SimpleBlend: 0.1596 |
+| 2022 | Cat: 0.1900 | NN: 0.2360 | SimpleBlend: 0.1992 |
+| 2023 | Cat: 0.2297 | NN: 0.2670 | SimpleBlend: 0.2364 |
+| 2024 | Cat: 0.1757 | NN: 0.1977 | SimpleBlend: 0.1743 |
+| 2025 | Cat: 0.1410 | NN: 0.1717 | SimpleBlend: 0.1470 |
+
+🌟 최적 가중치: CatBoost=90.32%, NN=9.68%
+🌟 블렌딩 전 점수: 0.16996
+🌟 보정(Isotonic Calibration) 후 최종 Brier Score: 0.16597
+------------------------------------------------------------
+🎯 V10 개선량 (V8 0.1652 대비): -0.00077
+⏱️ 총 소요 시간: 2.0분
+------------------------------------------------------------

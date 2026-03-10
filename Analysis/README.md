@@ -70,36 +70,68 @@ pip install pandas==2.3.3 numpy==2.0.2 scikit-learn==1.6.1 optuna==4.7.0 xgboost
     1.  **단순 평균 (Simple Average):** 예측된 확률값 3개를 더해 3으로 나눕니다. 가장 구현이 쉽고 베이스라인으로 강력합니다.
     2.  **최적 가중치 평균 (Weighted Average):** `scipy.optimize.minimize` (주로 SLSQP 메서드)를 활용하여 Validation Set의 Brier Score를 최소화하는 각 모델별 최적의 가중치(예: LGBM 0.4, XGB 0.3, CAT 0.3)를 찾습니다.
 
-### Step 3. 메타 모델 가세 (5-Model Ensemble & Logistic Calibration)
+### Step 3. 메타 모델 가세 (5-Model Ensemble & Calibration)
 *   **목적:** 트리 모델들이 잡지 못하는 선형적 관계를 보완하고, 최종 확률값의 신뢰도(Calibration)를 대회 평가지표에 완벽히 맞춥니다.
 *   **추가 알고리즘:** `Logistic Regression` (강력한 L1/L2 정규화 포함) 추가.
 *   **자체 레이팅(Part I) 휴리스틱 추가:** 머신러닝 모델이 아닌, 수학적으로 도출된 `Elo_WinProb` (Elo 레이팅 기반 승률 예측치)를 5번째 독립적인 예측 모델처럼 취급하여 병합합니다.
 *   **결합 및 보정 방식:**
     *   총 5개 결과물(LGBM, XGB, CAT, LR, Elo)을 최적 가중치로 앙상블(`blend_predictions`).
-    *   **Logistic Calibration (로지스틱 보정):** 앙상블된 최종 확률 예측값이 실제 0과 1 분포에 맞게 잘 스케일링 되었는지(overconfident하지 않은지) 확인하기 위해 `scipy.special.logit` 변환 후 다시 한번 1D Logistic Regression을 통과시켜 확률값을 세밀하게 깎아냅니다 (Calibration).
+    *   **Isotonic Calibration / Logistic Calibration:** 앙상블된 최종 확률 예측값이 실제 0과 1 분포에 맞게 잘 스케일링 되었는지 확인하고, `IsotonicRegression` 또는 `LogisticRegression`을 통해 확률값을 세밀하게 보정합니다. (Brier Score 개선 핵심)
 
-### Step 4. 비선형 신경망 아키텍처 결합 (Adding MLP / Neural Nets)
-*   **목적:** 데이터가 풍부해지고 파생 변수(Diff, Ratio 등)의 복잡한 비선형 교차 작용을 탐지하기 위해 딥러닝 기법을 마지막에 스택킹합니다.
+### Step 4. 비선형 신경망 아키텍처 및 고급 앙상블 (NN & MoE)
+*   **목적:** 데이터가 풍부해지고 파생 변수의 복잡한 비선형 교차 작용을 탐지하기 위해 딥러닝 및 고급 앙상블(Mixture of Experts) 기법을 활용합니다.
 *   **모델 구조 제안:**
-    *   `PyTorch`를 활용한 3-Layer MLP 깊은 앙상블 (예: `march-mania.ipynb` 참조).
-    *   범주형 변수(Seed Number, Conference Code 등)를 처리하기 위한 임베딩(Embedding) 레이어 + 연속형 변수를 처리하는 Dense 레이어 구조.
-*   **앙상블 방식 (Stacking):**
-    *   Step 3까지 만들어진 트리+선형 보정 모델들의 예측 결과치 값들 자체를 새로운 피처셋으로 삼고(Meta Features), 신경망 모델이 이를 입력받아 최종 최적화 확률을 내뿜도록 아키텍처를 구성합니다 (Deep Blending).
+    *   `PyTorch`를 활용한 3-Layer MLP (128→64→32) + Dropout(0.3) + Label Smoothing(0.05).
+    *   **MoE 스타일 융합:** FFM(Factorization Machine) + GBDT + LR + NN의 예측값들을 Meta-Feature로 활용하여 다시 신경망이나 XGBoost로 학습시키는 이중 경로 융합 (Path-based Fusion).
+*   **데이터 증강 (Advanced Augmentation):** 가우시안 노이즈(`N(0, 0.02)`) 추가 및 30% 샘플의 피처/라벨 반전(Flip) 등을 통해 모델의 일반화 성능을 극대화합니다.
 
 ---
 
 ## 6. 남녀 모델 분리 학습 (Gender Separation) 시스템
 *   제출 양식에는 남성과 여성 팀이 서로 맞붙는 혼합 경기(Mixed Matchup)가 존재하지 않습니다.
 *   따라서 남성(Men's) 데이터와 여성(Women's) 데이터를 **완전히 분리하여 두 개의 독립된 파이프라인(Step 1 ~ 4)으로 학습**시킵니다.
-    *   여성 데이터는 상대적으로 이변(Upset)이 적고 상위 시드가 승리할 확률이 더 높게 나타나는 패턴이 있으므로, 하이퍼파라미터와 앙상블 가중치를 남성 모델과 별도로 도출해야 합니다.
-*   추론 후, `[M_Pred_DF, W_Pred_DF]`를 마지막 `submission.csv` 작성(Concat) 시점에만 하나로 이어 붙입니다.
+    *   **성별 특성 차이:** 남성은 업셋(Upset) 비율이 높고(약 27%), 여성은 상위 시드가 승리할 확률이 더 높은 경향(약 21%)이 있습니다. 이를 반영하여 하이퍼파라미터를 각기 다르게 튜닝해야 합니다.
+*   추론 후, `[M_Pred_DF, W_Pred_DF]`를 마지막 `submission.csv` 작성 시점에만 하나로 이어 붙입니다.
 
 ---
 
-## 7. 최종 예측 및 제출 (Prediction & Submission)
+## 7. 타인의 분석 사례 참고 (Reference Analysis Cases)
+`Example/Model_Analysis.md`에 정리된 3가지 주요 접근 방식을 단계별 실험에 참고합니다.
+
+### Case 1. 정교한 피처 엔지니어링 & Brier 가중 앙상블
+- **핵심:** 99개 피처 (Elo, Massey, Four Factors, Momentum 등).
+- **앙상블:** LGB + XGB + CAT + LR 4모델 앙상블.
+- **특이점:** **Inverse-Brier 가중 평균** (보정 성능이 좋은 모델에 높은 가중치) + **Isotonic Calibration** 적용.
+
+### Case 2. 심플한 피처 & 스택킹 메타 모델
+- **핵심:** 16개 핵심 피처 (시드 차이, 평균 득실 차이 등) 위주.
+- **앙상블:** LGB + XGB + CAT 5-fold CV 예측값을 입력으로 받는 **Logistic Regression Stacking**.
+- **특이점:** 복잡한 피처보다 모델 간의 앙상블(Stacking) 효과에 집중.
+
+### Case 3. 대규모 피처 & 3-Layer MoE 아키텍처
+- **핵심:** 188개 피처 (고급 팀 통계, SOS, Recency 등).
+- **구조:** 
+    - Layer 1: FFM, GBDT, LR, NN (총 11개 베이스 모델).
+    - Layer 2: MoE 스타일 이중 경로 융합 (은닉 요인 융합 + Pctr 점수 융합).
+    - Layer 3: 최종 메타 모델 학습.
+- **특이점:** FFM(Factorization Machine)을 통한 피처 교호작용 탐지 및 복잡한 신경망 융합.
+
+---
+
+## 8. 최종 예측 및 제출 (Prediction & Submission)
 2026년 대회가 실제로 개최되어 대진 예측을 할 때의 파이프라인입니다.
 
 1.  2026년 정규 시즌 성적을 바탕으로 완성된 [Step 1~4] 파이프라인 전처리 코드를 가동합니다.
-2.  `SampleSubmissionStage1.csv` (또는 Stage2)에 적힌 모든 가상 매치업(`ID: 2026_1101_1102`)을 읽어옵니다.
+2.  `SampleSubmissionStage1.csv` (또는 Stage2)에 적힌 모든 가상 매치업을 읽어옵니다.
 3.  성별 식별자에 맞춰 남성 모델 / 여성 모델에 각각 통과시켜 승리 예측 확률(Pred)을 도출합니다.
-4.  지정된 형식(`ID`, `Pred`)에 맞춰 `submission.csv` 파일을 생성합니다. 무한대 감점을 막기 위해 Brier Score 최적화가 안 된 상태라면 예측값을 절대 0이나 1로 두지 않고 (예: `clip(0.001, 0.999)`) 안전 장치를 걸어둡니다.
+4.  **안전 장치:** Brier Score 최적화가 안 된 상태라면 예측값을 절대 0이나 1로 두지 않고 `clip(0.025, 0.975)` 등으로 안전 범위를 설정합니다.
+
+---
+
+## 9. 모델 훈련 시 모니터링 토큰/비용 최적화 팁 (Token Optimization)
+모델 학습(특히 Optuna 튜닝이나 K-Fold 교차검증 등)은 긴 시간이 소요되므로, 터미널 로그를 실시간으로 계속 확인하려고 하면 대기 시간과 불필요한 토큰 소모가 크게 발생합니다. 이를 방지하고 효율적으로 작업하기 위한 권장 워크플로우는 다음과 같습니다:
+
+1. **학습 실시간 모니터링 및 작업 끊기**: 코드를 작성하고 실행할 때, 명령어 출력을 터미널과 로그 파일에 동시에 실시간으로 출력하도록 `tee` 명령어를 사용합니다. (예: `python -u script.py 2>&1 | tee train.log`) 그리고 실행 명령을 내린 직후 AI 코딩 에이전트의 작업을 완전히 중단(종료)시켜 불필요한 로그 분석 토큰 소모를 방지합니다.
+2. **트리 파라미터 Verbose 최소화**: XGBoost, LightGBM, CatBoost 모델 학습 시 `verbose=False` 나 `verbose=-1` 옵션을 부여하여 저장되는 로그 파일의 크기가 과도하게 커지지 않도록 합니다.
+3. **학습 완료 후 결과 분석 지시**: 학습이 완전히 종료된 후(사용자가 직접 종료 여부 확인), AI에게 **"이제 로그(train.log)를 확인하고, 다음으로 개선할 수 있는 방안을 탐색하고, 코드를 만들고 실행해"** 라고 새로운 프롬프트를 입력합니다.
+4. **이전 작업 로그 확인**: AI는 새로운 프롬프트를 받고 나면, 이전 작업에서 생성되어 저장된 `train.log` 파일을 읽어들여 전체 학습 결과를 한 번에 분석하고 다음 스텝을 지연 없이 진행할 수 있습니다.
