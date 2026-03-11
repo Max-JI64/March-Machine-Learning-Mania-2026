@@ -1,0 +1,64 @@
+{
+    "Men_CatBoost": {
+        "iterations": 2254,
+        "learning_rate": 0.005665010280696196,
+        "depth": 10,
+        "l2_leaf_reg": 1.03039316006632,
+        "subsample": 0.7020432010197195,
+        "random_strength": 2.955603270500493,
+        "bagging_temperature": 1.2520966291621098,
+        "border_count": 51
+    },
+    "Men_XGBoost": {
+        "n_estimators": 2050,
+        "learning_rate": 0.0016787146774915821,
+        "max_depth": 8,
+        "min_child_weight": 17,
+        "subsample": 0.4971232140194616,
+        "colsample_bytree": 0.6400884890042355,
+        "gamma": 0.0415219778449758
+    },
+    "Men_LightGBM": {
+        "n_estimators": 2163,
+        "learning_rate": 0.0020558415674143894,
+        "num_leaves": 102,
+        "max_depth": 7,
+        "min_data_in_leaf": 33,
+        "feature_fraction": 0.40719985639427864,
+        "bagging_fraction": 0.479809114885044,
+        "bagging_freq": 2,
+        "lambda_l1": 2.2528722627430944,
+        "lambda_l2": 7.727156369789566e-06
+    },
+    "Women_CatBoost": {
+        "iterations": 1769,
+        "learning_rate": 0.004263925944348364,
+        "depth": 4,
+        "l2_leaf_reg": 0.7173842049983317,
+        "subsample": 0.48208138761722974,
+        "random_strength": 1.5239690695815478,
+        "bagging_temperature": 4.104383155546372,
+        "border_count": 183
+    },
+    "Women_XGBoost": {
+        "n_estimators": 2185,
+        "learning_rate": 0.022453543249844353,
+        "max_depth": 8,
+        "min_child_weight": 1,
+        "subsample": 0.668200320248112,
+        "colsample_bytree": 0.6843687388101722,
+        "gamma": 1.64012925455637
+    },
+    "Women_LightGBM": {
+        "n_estimators": 2000,
+        "learning_rate": 0.0022037321695278834,
+        "num_leaves": 225,
+        "max_depth": 5,
+        "min_data_in_leaf": 154,
+        "feature_fraction": 0.500733959825953,
+        "bagging_fraction": 0.46325500538008324,
+        "bagging_freq": 3,
+        "lambda_l1": 0.02167626643006083,
+        "lambda_l2": 4.613940932747758
+    }
+}

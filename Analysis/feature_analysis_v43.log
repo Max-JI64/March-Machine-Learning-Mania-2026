@@ -1,0 +1,29 @@
+🔍 Extracting Feature Importance from V42 Architecture...
+
+📊 Feature Importance Ranking (Top 10):
+                Feature  CatBoost  XGBoost  LightGBM  Mean_Imp
+               SRS_Diff  0.085552 0.150733  0.049333  0.095206
+         Elo_x_SRS_Diff  0.067401 0.026460  0.048600  0.047487
+      Non_Conf_SOS_Diff  0.049951 0.017850  0.060200  0.042667
+          Home_Lat_Diff  0.048030 0.011649  0.060500  0.040060
+          Home_Lon_Diff  0.034998 0.016345  0.061067  0.037470
+Close_Game_WinRate_Diff  0.039213 0.015485  0.056200  0.036966
+         Score_Std_Diff  0.032634 0.013745  0.060867  0.035749
+     Pyth_Expected_Diff  0.033584 0.012092  0.055167  0.033614
+    WinRate_x_Pyth_Diff  0.037748 0.008545  0.054467  0.033586
+         Score_Max_Diff  0.037476 0.011672  0.045733  0.031627
+
+📉 Candidate Noise Features (Bottom 10):
+                         Feature  CatBoost  XGBoost  LightGBM  Mean_Imp
+LateSeason_Altitude_Fatigue_Diff  0.010415 0.030898  0.004967  0.015427
+                       3PAr_Diff  0.011150 0.024610  0.009333  0.015031
+                     DefRtg_Diff  0.012221 0.020257  0.011367  0.014615
+                        Blk_Diff  0.009762 0.023502  0.008867  0.014044
+                        OR%_Diff  0.010815 0.021302  0.008700  0.013606
+                     SeedWinProb  0.039284 0.000000  0.000000  0.013095
+                    MasMean_Diff  0.008448 0.014079  0.015833  0.012787
+             Momentum_Upset_Risk  0.007611 0.017681  0.006433  0.010575
+                      EloWinProb  0.018323 0.000000  0.006900  0.008408
+              Is_Major_Conf_Diff  0.008111 0.012925  0.000567  0.007201
+
+✅ Importance results saved to 'v43_feature_importance.csv'
