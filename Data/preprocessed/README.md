@@ -240,6 +240,7 @@
 > *   따라서, 실제 2026년 토너먼트가 개막한 뒤 특정 팀이 1라운드에서 압도적으로 이겼다고(기세가 올랐다고) 하더라도, 그 `어제 경기(토너먼트 1R) 결과값`을 오늘 2라운드 예측 변수로 사용할 수 없습니다.
 > *   **결론:** 우리의 모든 롤링 데이터 및 기세(Momentum) 변수 계산의 **타임라인 마지노선은 반드시 `정규시즌 마지막 날(DayNum=132)`**에서 끊겨야 하며, 예측 대상인 토너먼트 경기(`DayNum >= 134`)의 데이터는 모델 추론 시점에 절대 결합되어서는 안 됩니다.
 
+
 ### F. 과거 토너먼트 및 하위 대회 경험 (Historical & Secondary Tourney Exp)
 **사용 데이터:** `*NCAATourneyDetailedResults.csv`, `*SecondaryTourney*.csv`
 정규시즌이 아닌 과거 토너먼트 및 포스트시즌(NIT, CBI 등)에서의 성과와 세부 스탯을 바탕으로 "큰 경기 DNA"와 "다크호스 잠재력"을 수치화합니다.
@@ -305,5 +306,92 @@
     *   **전처리 (Train 및 Stacking 단계):** 딥러닝 앙상블 추가 시 OOF Brier Score에 0과 1 근접 극단치 패널티를 덜 부과받기 위해. 확률을 부드럽게 변환시킵니다.
     *   **공식 결합:** `y_smooth = y * 0.95 + 0.5 * 0.05`
 
+
+```python
+# ==============================================================================
+# [파트 J] 데이터베이스 증강 기법 (Data Augmentation) - Train_df 전용 증폭 툴킷
+# ==============================================================================
+
+def symmetric_data_swapping(train_df, t1_cols, t2_cols, diff_cols, target_col='Outcome'):
+    """
+    1. 대칭 스왑 (Symmetric Swap) : 팀1과 팀2 위치를 전부 뒤집어 학습 데이터를 2배로 확장
+    """
+    train_aug = train_df.copy()
+    
+    # 기초 팀 스탯 서로 교환
+    train_aug[t1_cols], train_aug[t2_cols] = train_df[t2_cols].values, train_df[t1_cols].values
+    
+    # 격차(Diff) 피처 수치들 부호 완전히 반전 (-1 곱하기)
+    if len(diff_cols) > 0:
+        train_aug[diff_cols] = -train_df[diff_cols].values
+        
+    # 결과 라벨 반전 (T1 승리(1) -> 스왑 후 T2 승리(0))
+    train_aug[target_col] = 1 - train_df[target_col]
+    
+    # 증강 데이터 구분 플래그
+    train_df['Is_Augmented'] = 0
+    train_aug['Is_Augmented'] = 1
+    
+    # 상하로 이어붙여 2배 확장
+    return pd.concat([train_df, train_aug], axis=0).reset_index(drop=True)
+
+def apply_gaussian_noise(train_df, continuous_cols, noise_scale=0.03):
+    """
+    2. 연속형 데이터 가우시안 노이즈 (Gaussian Noise) : 스탯 수치에 지터(Jitter)를 가해 과적합 억제
+    """
+    noisy_df = train_df.copy()
+    
+    for col in continuous_cols:
+        std_val = train_df[col].std()
+        noise = np.random.normal(0, std_val * noise_scale, size=len(noisy_df))
+        noisy_df[col] += noise
+        
+    noisy_df['Is_Augmented'] = 2 # 노이즈 증강 플래그 할당
+    
+    # 최종적으로 (원본) + (Symmetric 원본) + (원볼 노이즈) 등 배수 단위 증폭 수행
+    return pd.concat([train_df, noisy_df], axis=0).reset_index(drop=True)
+
+def get_recency_sample_weights(seasons_array, max_season=None, decay=0.60):
+    """
+    3. 타임라인 가중치 (Recency Weights) 부여 : 오래전 대회일수록 트리의 가중치 하락
+    LGBM 훈련시 fit(X, y, sample_weight=weights) 파라미터로 사용
+    """
+    if max_season is None:
+        max_season = seasons_array.max()
+        
+    # 2010년 매치업이면 현재(2025) 기준 큰 격차가 있어 0.6^15 배의 데미지를 받음
+    weights = decay ** (max_season - seasons_array)
+    
+    # 트리 부스팅 시 스케일 변동 방지를 위한 Normalize (평균: 1.0)
+    weights = weights / weights.mean()
+    return weights
+
+def label_smoothing(y_target, smoothing_val=0.05):
+    """
+    4. Label Smoothing : 극단 확률로 인한 Brier Score 페널티 예방용 타겟 보정
+    """
+    # 1은 0.975로 낮추고, 0은 0.025로 올려 모델이 "100% 확신"을 못하도록 막아줌
+    return y_target * (1 - smoothing_val) + 0.5 * smoothing_val
+
+```
 ---
 **추후 계획**: 위에서 제안한 새로운 파생 변수들의 전처리 로직(공식, 사용 피처 맵핑)을 Python 코드로 구현하여 기존 `T1 vs T2 Diff` 파이프라인에 병합할 예정입니다.
+
+### J. [NEW] 추천 참고 피처 및 FFM 교호작용 (Advanced MoE Features)
+**목적:** 타 분석 사례(Model_Analysis.md - Case 3)에서 신경망 및 MoE 구조 훈련 시 핵심으로 활용되었던 극단적 교호작용 및 시계열 보정 변수입니다.
+
+*   **FFM (Factorization Machine) 전용 비선형 교호작용 지표 (Interactions)**:
+    *   **전처리:** 단순한 뺄셈(`Diff`)을 넘어서, 이질적인 두 변수 간의 **곱셈(Product)**을 통해 숨겨진 시너지를 강제로 추출합니다. 트리가 층을 깊게 타야 알 수 있는 비선형성을 얕은 층에서도 바로 학습할 수 있게 던져줍니다.
+    *   **권장 추가 변수명:**
+        *   `IX_Elo_x_SeedDiff` (Elo 차이 × 시드 차이)
+        *   `IX_NetRtg_x_SeedDiff` (Net Rating 마진 × 시드 차이)
+        *   `IX_Massey_x_Elo` (Massey 순위 마진 × Elo 마진)
+        *   `IX_Off_x_Def` (공격 효율 Diff × 수비 효율 Diff 보정)
+*   **업셋 가능성 및 핫폼 스코어 (Upset & Hotness Score)**:
+    *   **전처리:** 상위 시드가 하위 시드에게 덜미를 잡히는 'Upset'이 일어날 최적의 조건(시드 차이는 큰데, 실제 전력 지표 차이는 적은 경우)을 수식화합니다.
+    *   **권장 추가 변수명:**
+        *   `UpsetScore`: `|SeedDiff| * (1 - |EloDiff| / 200)`
+        *   `HotnessScore`: `|SeedDiff| * Last14_WinRate_Diff` (시드는 차이나지만, 하위 시드의 최근 폼이 미친 듯이 좋은 경우 위험도 상승)
+*   **시계열 지수 감쇠 (Exponential Decay) 기반 모멘텀**:
+    *   **전처리:** 단순히 '최근 14일 평균'을 구하는 B 파트의 롤링을 넘어서, **최근 경기일수록 더 높은 가중치(예: 0.85^N)**를 주어 평균을 도출하는 지수 감쇠 승률/마진을 사용합니다.
+    *   **권장 추가 변수명:** `Momentum_Decay_Win`, `Momentum_Decay_NetRtg`

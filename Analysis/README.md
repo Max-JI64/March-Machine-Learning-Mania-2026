@@ -79,11 +79,15 @@ pip install pandas==2.3.3 numpy==2.0.2 scikit-learn==1.6.1 optuna==4.7.0 xgboost
     *   **Isotonic Calibration / Logistic Calibration:** 앙상블된 최종 확률 예측값이 실제 0과 1 분포에 맞게 잘 스케일링 되었는지 확인하고, `IsotonicRegression` 또는 `LogisticRegression`을 통해 확률값을 세밀하게 보정합니다. (Brier Score 개선 핵심)
 
 ### Step 4. 비선형 신경망 아키텍처 및 고급 앙상블 (NN & MoE)
-*   **목적:** 데이터가 풍부해지고 파생 변수의 복잡한 비선형 교차 작용을 탐지하기 위해 딥러닝 및 고급 앙상블(Mixture of Experts) 기법을 활용합니다.
+*   **목적:** 데이터가 풍부해지고 파생 변수의 복잡한 비선형 교차 작용을 탐지하기 위해 딥러닝(NN) 및 혼합 전문가(Mixture of Experts) 기법을 활용합니다. 이 단계는 트리가 잡지 못하는 전술적 뉘앙스와 비선형 패턴을 추출하는 데 특화됩니다.
 *   **모델 구조 제안:**
-    *   `PyTorch`를 활용한 3-Layer MLP (128→64→32) + Dropout(0.3) + Label Smoothing(0.05).
-    *   **MoE 스타일 융합:** FFM(Factorization Machine) + GBDT + LR + NN의 예측값들을 Meta-Feature로 활용하여 다시 신경망이나 XGBoost로 학습시키는 이중 경로 융합 (Path-based Fusion).
-*   **데이터 증강 (Advanced Augmentation):** 가우시안 노이즈(`N(0, 0.02)`) 추가 및 30% 샘플의 피처/라벨 반전(Flip) 등을 통해 모델의 일반화 성능을 극대화합니다.
+    *   **Layer 1 (다중 Base 모델):** CatBoost, XGBoost, LightGBM, Logistic Regression에 추가하여, 피처 교호작용(Interaction) 탐지에 강력한 **FFM (Fast Factorization Machine)** 및 **PyTorch 기반 3-Layer MLP** (128→64→32, Dropout 0.3, Label Smoothing 0.05 적용) 등을 병렬로 배치합니다. (10개 이상의 이질적인 Base 모델 구축)
+    *   **Layer 2 (MoE 스타일 이중 경로 융합):** 
+        *   **Path 1 (은닉 요인 융합):** Base 모델의 예측 확률뿐만 아니라, NN의 은닉층(Hidden Layer) 출력값까지 피처로 받아들여 다시 NN과 XGBoost로 메타 학습을 진행합니다.
+        *   **Path 2 (Pctr 점수 융합):** 순수하게 각 Base 모델들의 최종 확률값 만을 앙상블하여 별도의 메타 모델(NN, LogReg 등)로 보정 학습합니다.
+    *   **Layer 3 (최종 메타 모델):** Path 1과 Path 2의 결과를 최종 앙상블합니다.
+*   **데이터 증강 (Advanced Augmentation):**
+    *   Symmetric Swapping (승/패 위치 변경) 외에 가우시안 노이즈(`N(0, 0.02)`) 추가 및 30% 샘플의 부호/라벨 반전(Sign Flip) 등을 통해 신경망 모델의 오버피팅을 극도로 억제합니다.
 
 ---
 

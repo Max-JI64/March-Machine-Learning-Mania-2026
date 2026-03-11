@@ -38,3 +38,5 @@ Temporary Items
 __pycache__/
 *.py[cod]
 *$py.class
+
+Analysis/catboost_info/*

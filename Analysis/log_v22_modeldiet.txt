@@ -1,0 +1,30 @@
+
+🔥 V22: Model Diet (CatBoost, XGBoost, ExtraTrees) & Advanced MoE & Full Augmentation
+🚀 M V22 피처 통합 (V20 + J 파트 Momentum Decay/Interactions)...
+🚀 W V22 피처 통합 (V20 + J 파트 Momentum Decay/Interactions)...
+
+🚀 총 45개 피처로 3개 핵심 모델(CatBoost, XGBoost, ExtraTrees) 학습 시작...
+| Year | Cat | XGB | ET | Blend | Calib |
+
+📅 [시즌 2013] 검증 시작...
+   - CatBoost 훈련 중... (1200 iters) [완료]
+   - XGBoost 훈련 중... (1000 trees) [완료]
+   - ExtraTrees 훈련 중... [완료]
+| 2013 | 0.1828 | 0.1834 | 0.1747 | 0.1789 | 0.1622 |
+
+📅 [시즌 2014] 검증 시작...
+   - CatBoost 훈련 중... (1200 iters) [완료]
+   - XGBoost 훈련 중... (1000 trees) [완료]
+   - ExtraTrees 훈련 중... [완료]
+| 2014 | 0.1732 | 0.1746 | 0.1707 | 0.1700 | 0.1520 |
+
+📅 [시즌 2015] 검증 시작...
+   - CatBoost 훈련 중... (1200 iters) [완료]
+   - XGBoost 훈련 중... (1000 trees) [완료]
+   - ExtraTrees 훈련 중... [완료]
+| 2015 | 0.1425 | 0.1440 | 0.1359 | 0.1397 | 0.1227 |
+
+📅 [시즌 2016] 검증 시작...
+   - CatBoost 훈련 중... (1200 iters) [완료]
+   - XGBoost 훈련 중... (1000 trees) [완료]
+   - ExtraTrees 훈련 중...
