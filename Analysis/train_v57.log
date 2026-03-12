@@ -1,0 +1,26 @@
+/Users/swoo64/.matplotlib is not a writable directory
+Matplotlib created a temporary cache directory at /var/folders/5r/gp1130xx2t5fbxbgt43xtp_m0000gn/T/matplotlib-c9z4bigo because there was an issue with the default path (/Users/swoo64/.matplotlib); it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
+
+🔥 V57: V55 Base + Legitimate K-Fold Isotonic Calibration (3-Fold OOF)
+Men's features: 36 | Women's features: 35
+Seeds: 10 | Calib Folds: 3 | Label Smooth: 0.01 | Noise: 0.02
+
+🚀 Starting V57 Evaluation...
+| Year | Men's Brier | Women's Brier | Total Weighted Brier |
+  [Year 2012] 6-Model x 10 Seeds + K-Fold Isotonic... Done! -> M: 0.1724 | W: 0.1192 | Total: 0.1470
+  [Year 2013] 6-Model x 10 Seeds + K-Fold Isotonic... Done! -> M: 0.1862 | W: 0.1514 | Total: 0.1693
+  [Year 2014] 6-Model x 10 Seeds + K-Fold Isotonic... Done! -> M: 0.2009 | W: 0.1198 | Total: 0.1616
+  [Year 2015] 6-Model x 10 Seeds + K-Fold Isotonic... Done! -> M: 0.1724 | W: 0.1233 | Total: 0.1486
+  [Year 2016] 6-Model x 10 Seeds + K-Fold Isotonic... Done! -> M: 0.1834 | W: 0.1490 | Total: 0.1671
+  [Year 2017] 6-Model x 10 Seeds + K-Fold Isotonic... Done! -> M: 0.1744 | W: 0.1298 | Total: 0.1527
+  [Year 2018] 6-Model x 10 Seeds + K-Fold Isotonic... Done! -> M: 0.1877 | W: 0.1359 | Total: 0.1626
+  [Year 2019] 6-Model x 10 Seeds + K-Fold Isotonic... Done! -> M: 0.1568 | W: 0.1375 | Total: 0.1475
+  [Year 2021] 6-Model x 10 Seeds + K-Fold Isotonic... Done! -> M: 0.1983 | W: 0.1338 | Total: 0.1668
+  [Year 2022] 6-Model x 10 Seeds + K-Fold Isotonic... Done! -> M: 0.2277 | W: 0.1577 | Total: 0.1930
+  [Year 2023] 6-Model x 10 Seeds + K-Fold Isotonic... Done! -> M: 0.2068 | W: 0.2021 | Total: 0.2045
+  [Year 2024] 6-Model x 10 Seeds + K-Fold Isotonic... Done! -> M: 0.1894 | W: 0.1427 | Total: 0.1661
+  [Year 2025] 6-Model x 10 Seeds + K-Fold Isotonic... Done! -> M: 0.1598 | W: 0.1242 | Total: 0.1420
+----------------------------------------------------------------------------------------------------
+🎯 V57 (V55 + K-Fold Isotonic) 평균 Brier Score: 0.16375
+⏱️ 총 소요 시간: 35.9분
+----------------------------------------------------------------------------------------------------

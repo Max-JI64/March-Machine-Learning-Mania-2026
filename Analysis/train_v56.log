@@ -1,0 +1,27 @@
+/Users/swoo64/.matplotlib is not a writable directory
+Matplotlib created a temporary cache directory at /var/folders/5r/gp1130xx2t5fbxbgt43xtp_m0000gn/T/matplotlib-0i5dbawo because there was an issue with the default path (/Users/swoo64/.matplotlib); it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
+
+🔥 V56: NO Augmentation, NO Label Smoothing + 6-Model + 10 Seeds
+Men's features: 36 | Women's features: 35
+Seeds: 10 | Augmentation: NONE | Label Smoothing: NONE
+Clipping - Men: (0.03, 0.97) | Women: (0.01, 0.99)
+
+🚀 Starting V56 Evaluation...
+| Year | Men's Brier | Women's Brier | Total Weighted Brier |
+  [Year 2012] Pure 6-Model x 10 Seeds... Done! -> M: 0.1768 | W: 0.1268 | Total: 0.1529
+  [Year 2013] Pure 6-Model x 10 Seeds... Done! -> M: 0.1953 | W: 0.1426 | Total: 0.1697
+  [Year 2014] Pure 6-Model x 10 Seeds... Done! -> M: 0.1991 | W: 0.1260 | Total: 0.1637
+  [Year 2015] Pure 6-Model x 10 Seeds... Done! -> M: 0.1709 | W: 0.1202 | Total: 0.1463
+  [Year 2016] Pure 6-Model x 10 Seeds... Done! -> M: 0.1868 | W: 0.1538 | Total: 0.1712
+  [Year 2017] Pure 6-Model x 10 Seeds... Done! -> M: 0.1703 | W: 0.1348 | Total: 0.1531
+  [Year 2018] Pure 6-Model x 10 Seeds... Done! -> M: 0.1887 | W: 0.1455 | Total: 0.1678
+  [Year 2019] Pure 6-Model x 10 Seeds... Done! -> M: 0.1557 | W: 0.1319 | Total: 0.1442
+  [Year 2021] Pure 6-Model x 10 Seeds... Done! -> M: 0.1998 | W: 0.1287 | Total: 0.1651
+  [Year 2022] Pure 6-Model x 10 Seeds... Done! -> M: 0.2266 | W: 0.1556 | Total: 0.1914
+  [Year 2023] Pure 6-Model x 10 Seeds... Done! -> M: 0.2054 | W: 0.1944 | Total: 0.2001
+  [Year 2024] Pure 6-Model x 10 Seeds... Done! -> M: 0.1821 | W: 0.1350 | Total: 0.1585
+  [Year 2025] Pure 6-Model x 10 Seeds... Done! -> M: 0.1644 | W: 0.1203 | Total: 0.1424
+----------------------------------------------------------------------------------------------------
+🎯 V56 (No Aug + 6-Model + 10 Seeds) 평균 Brier Score: 0.16357
+⏱️ 총 소요 시간: 24.0분
+----------------------------------------------------------------------------------------------------

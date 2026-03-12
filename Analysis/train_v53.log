@@ -1,0 +1,25 @@
+/Users/swoo64/.matplotlib is not a writable directory
+Matplotlib created a temporary cache directory at /var/folders/5r/gp1130xx2t5fbxbgt43xtp_m0000gn/T/matplotlib-ostlvnd6 because there was an issue with the default path (/Users/swoo64/.matplotlib); it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
+
+🔥 V53: RegSeason Data + Multi-Seed(5) + Historical OOF Calibration
+Men's features: 36 | Women's features: 35
+
+🚀 Starting V53 Evaluation...
+| Year | Men's Brier | Women's Brier | Total Weighted Brier |
+  [Year 2012] RegSeason + Multi-Seed Training... Done! -> M: 0.1784 | W: 0.1104 | Total: 0.1460
+  [Year 2013] RegSeason + Multi-Seed Training... Done! -> M: 0.1956 | W: 0.1420 | Total: 0.1696
+  [Year 2014] RegSeason + Multi-Seed Training... Done! -> M: 0.2045 | W: 0.1304 | Total: 0.1686
+  [Year 2015] RegSeason + Multi-Seed Training... Done! -> M: 0.1825 | W: 0.1125 | Total: 0.1486
+  [Year 2016] RegSeason + Multi-Seed Training... Done! -> M: 0.2034 | W: 0.1693 | Total: 0.1873
+  [Year 2017] RegSeason + Multi-Seed Training... Done! -> M: 0.1694 | W: 0.1270 | Total: 0.1489
+  [Year 2018] RegSeason + Multi-Seed Training... Done! -> M: 0.2005 | W: 0.1576 | Total: 0.1797
+  [Year 2019] RegSeason + Multi-Seed Training... Done! -> M: 0.1726 | W: 0.1371 | Total: 0.1554
+  [Year 2021] RegSeason + Multi-Seed Training... Done! -> M: 0.1994 | W: 0.1530 | Total: 0.1767
+  [Year 2022] RegSeason + Multi-Seed Training... Done! -> M: 0.2150 | W: 0.1622 | Total: 0.1888
+  [Year 2023] RegSeason + Multi-Seed Training... Done! -> M: 0.2205 | W: 0.1745 | Total: 0.1982
+  [Year 2024] RegSeason + Multi-Seed Training... Done! -> M: 0.1996 | W: 0.1222 | Total: 0.1609
+  [Year 2025] RegSeason + Multi-Seed Training... Done! -> M: 0.1523 | W: 0.1238 | Total: 0.1380
+----------------------------------------------------------------------------------------------------
+🎯 V53 (RegSeason + Multi-Seed + Historical Calib) 평균 Brier Score: 0.16667
+⏱️ 총 소요 시간: 174.9분
+----------------------------------------------------------------------------------------------------

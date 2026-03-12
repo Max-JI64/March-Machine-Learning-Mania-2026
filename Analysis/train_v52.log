@@ -1,0 +1,24 @@
+/Users/swoo64/.matplotlib is not a writable directory
+Matplotlib created a temporary cache directory at /var/folders/5r/gp1130xx2t5fbxbgt43xtp_m0000gn/T/matplotlib-rf5wo9v5 because there was an issue with the default path (/Users/swoo64/.matplotlib); it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
+
+🔥 V52: True Baseline (No Calibration) + Multi-Seed Ensemble (5 Seeds)
+
+🚀 Starting V52 Evaluation (5 Seeds x 3 Models = 15 models per year)...
+| Year | Men's Brier | Women's Brier | Total Weighted Brier |
+  [Year 2012] Multi-Seed Training... Done! ✅ -> M: 0.1746 | W: 0.1229 | Total: 0.1499
+  [Year 2013] Multi-Seed Training... Done! ✅ -> M: 0.1911 | W: 0.1482 | Total: 0.1703
+  [Year 2014] Multi-Seed Training... Done! ✅ -> M: 0.1938 | W: 0.1267 | Total: 0.1613
+  [Year 2015] Multi-Seed Training... Done! ✅ -> M: 0.1700 | W: 0.1257 | Total: 0.1486
+  [Year 2016] Multi-Seed Training... Done! ✅ -> M: 0.1859 | W: 0.1480 | Total: 0.1680
+  [Year 2017] Multi-Seed Training... Done! ✅ -> M: 0.1729 | W: 0.1326 | Total: 0.1534
+  [Year 2018] Multi-Seed Training... Done! ✅ -> M: 0.1842 | W: 0.1455 | Total: 0.1654
+  [Year 2019] Multi-Seed Training... Done! ✅ -> M: 0.1689 | W: 0.1417 | Total: 0.1557
+  [Year 2021] Multi-Seed Training... Done! ✅ -> M: 0.1966 | W: 0.1399 | Total: 0.1689
+  [Year 2022] Multi-Seed Training... Done! ✅ -> M: 0.2204 | W: 0.1516 | Total: 0.1863
+  [Year 2023] Multi-Seed Training... Done! ✅ -> M: 0.2113 | W: 0.1865 | Total: 0.1993
+  [Year 2024] Multi-Seed Training... Done! ✅ -> M: 0.1838 | W: 0.1406 | Total: 0.1622
+  [Year 2025] Multi-Seed Training... Done! ✅ -> M: 0.1667 | W: 0.1168 | Total: 0.1418
+----------------------------------------------------------------------------------------------------
+🎯 V52 (No Calibration + Multi-Seed x5) 평균 Brier Score: 0.16392
+⏱️ 총 소요 시간: 13.8분
+----------------------------------------------------------------------------------------------------

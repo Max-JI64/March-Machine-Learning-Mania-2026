@@ -1,0 +1,26 @@
+/Users/swoo64/.matplotlib is not a writable directory
+Matplotlib created a temporary cache directory at /var/folders/5r/gp1130xx2t5fbxbgt43xtp_m0000gn/T/matplotlib-h5l3mw7_ because there was an issue with the default path (/Users/swoo64/.matplotlib); it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
+
+🔥 V55: Sharpened Predictions (LabelSmooth=0.01, Noise=0.02) + 6-Model + 10 Seeds
+Men's features: 36 | Women's features: 35
+Seeds: 10 | Label Smoothing: 0.01 | Noise: 0.02
+
+🚀 Starting V55 Evaluation...
+| Year | Men's Brier | Women's Brier | Total Weighted Brier |
+  [Year 2012] Sharpened 6-Model x 10 Seeds... Done! -> M: 0.1726 | W: 0.1179 | Total: 0.1465
+  [Year 2013] Sharpened 6-Model x 10 Seeds... Done! -> M: 0.1887 | W: 0.1502 | Total: 0.1700
+  [Year 2014] Sharpened 6-Model x 10 Seeds... Done! -> M: 0.1980 | W: 0.1221 | Total: 0.1612
+  [Year 2015] Sharpened 6-Model x 10 Seeds... Done! -> M: 0.1676 | W: 0.1252 | Total: 0.1470
+  [Year 2016] Sharpened 6-Model x 10 Seeds... Done! -> M: 0.1826 | W: 0.1445 | Total: 0.1646
+  [Year 2017] Sharpened 6-Model x 10 Seeds... Done! -> M: 0.1728 | W: 0.1271 | Total: 0.1507
+  [Year 2018] Sharpened 6-Model x 10 Seeds... Done! -> M: 0.1865 | W: 0.1406 | Total: 0.1643
+  [Year 2019] Sharpened 6-Model x 10 Seeds... Done! -> M: 0.1632 | W: 0.1376 | Total: 0.1508
+  [Year 2021] Sharpened 6-Model x 10 Seeds... Done! -> M: 0.1993 | W: 0.1363 | Total: 0.1685
+  [Year 2022] Sharpened 6-Model x 10 Seeds... Done! -> M: 0.2253 | W: 0.1528 | Total: 0.1893
+  [Year 2023] Sharpened 6-Model x 10 Seeds... Done! -> M: 0.2098 | W: 0.1896 | Total: 0.2000
+  [Year 2024] Sharpened 6-Model x 10 Seeds... Done! -> M: 0.1884 | W: 0.1385 | Total: 0.1634
+  [Year 2025] Sharpened 6-Model x 10 Seeds... Done! -> M: 0.1620 | W: 0.1155 | Total: 0.1388
+----------------------------------------------------------------------------------------------------
+🎯 V55 (Sharpened + 6-Model + 10 Seeds) 평균 Brier Score: 0.16270
+⏱️ 총 소요 시간: 28.0분
+----------------------------------------------------------------------------------------------------

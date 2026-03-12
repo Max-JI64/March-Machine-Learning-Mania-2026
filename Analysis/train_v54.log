@@ -1,0 +1,26 @@
+/Users/swoo64/.matplotlib is not a writable directory
+Matplotlib created a temporary cache directory at /var/folders/5r/gp1130xx2t5fbxbgt43xtp_m0000gn/T/matplotlib-3goauy1v because there was an issue with the default path (/Users/swoo64/.matplotlib); it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
+
+🔥 V54: 5-Model Ensemble (Tree x3 + L1 LR + ElasticNet) + Elo + Multi-Seed(5)
+Men's features: 36 | Women's features: 35
+Weights M: [0.16, 0.3, 0.14, 0.15, 0.15, 0.1] | W: [0.3, 0.14, 0.14, 0.15, 0.15, 0.12]
+
+🚀 Starting V54 Evaluation (5 Models + Elo, 5 Seeds)...
+| Year | Men's Brier | Women's Brier | Total Weighted Brier |
+  [Year 2012] 5-Model Multi-Seed... Done! -> M: 0.1713 | W: 0.1181 | Total: 0.1459
+  [Year 2013] 5-Model Multi-Seed... Done! -> M: 0.1890 | W: 0.1508 | Total: 0.1705
+  [Year 2014] 5-Model Multi-Seed... Done! -> M: 0.1986 | W: 0.1250 | Total: 0.1629
+  [Year 2015] 5-Model Multi-Seed... Done! -> M: 0.1691 | W: 0.1272 | Total: 0.1488
+  [Year 2016] 5-Model Multi-Seed... Done! -> M: 0.1828 | W: 0.1453 | Total: 0.1650
+  [Year 2017] 5-Model Multi-Seed... Done! -> M: 0.1717 | W: 0.1273 | Total: 0.1502
+  [Year 2018] 5-Model Multi-Seed... Done! -> M: 0.1856 | W: 0.1413 | Total: 0.1641
+  [Year 2019] 5-Model Multi-Seed... Done! -> M: 0.1647 | W: 0.1360 | Total: 0.1508
+  [Year 2021] 5-Model Multi-Seed... Done! -> M: 0.1988 | W: 0.1364 | Total: 0.1683
+  [Year 2022] 5-Model Multi-Seed... Done! -> M: 0.2218 | W: 0.1535 | Total: 0.1879
+  [Year 2023] 5-Model Multi-Seed... Done! -> M: 0.2099 | W: 0.1869 | Total: 0.1987
+  [Year 2024] 5-Model Multi-Seed... Done! -> M: 0.1891 | W: 0.1393 | Total: 0.1642
+  [Year 2025] 5-Model Multi-Seed... Done! -> M: 0.1631 | W: 0.1165 | Total: 0.1398
+----------------------------------------------------------------------------------------------------
+🎯 V54 (5-Model + Elo + Multi-Seed x5) 평균 Brier Score: 0.16287
+⏱️ 총 소요 시간: 17.8분
+----------------------------------------------------------------------------------------------------
