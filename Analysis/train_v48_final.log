@@ -1,4 +1,58 @@
+/Users/swoo64/.matplotlib is not a writable directory
+Matplotlib created a temporary cache directory at /var/folders/5r/gp1130xx2t5fbxbgt43xtp_m0000gn/T/matplotlib-55sxmlwm because there was an issue with the default path (/Users/swoo64/.matplotlib); it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
+🔥 V48: Final Ensemble & Calibration (Deep Optuna Params + Global Weight Optimization + Isotonic)
 
-🔥 V48: FINAL ENSEMBLE ASSAULT (V47 Deep Search Params + V43 Features)
-✅ Men's Features: 36, Women's Features: 35
-| Year | Men's Brier | Women's Brier | Final Blended Brier |
+🚀 1. Collecting OOF Predictions for Men...
+  [Year 2012] Data prep... CatBoost... XGBoost... LightGBM... Done! ✅
+  [Year 2013] Data prep... CatBoost... XGBoost... LightGBM... Done! ✅
+  [Year 2014] Data prep... CatBoost... XGBoost... LightGBM... Done! ✅
+  [Year 2015] Data prep... CatBoost... XGBoost... LightGBM... Done! ✅
+  [Year 2016] Data prep... CatBoost... XGBoost... LightGBM... Done! ✅
+  [Year 2017] Data prep... CatBoost... XGBoost... LightGBM... Done! ✅
+  [Year 2018] Data prep... CatBoost... XGBoost... LightGBM... Done! ✅
+  [Year 2019] Data prep... CatBoost... XGBoost... LightGBM... Done! ✅
+  [Year 2021] Data prep... CatBoost... XGBoost... LightGBM... Done! ✅
+  [Year 2022] Data prep... CatBoost... XGBoost... LightGBM... Done! ✅
+  [Year 2023] Data prep... CatBoost... XGBoost... LightGBM... Done! ✅
+  [Year 2024] Data prep... CatBoost... XGBoost... LightGBM... Done! ✅
+  [Year 2025] Data prep... CatBoost... XGBoost... LightGBM... Done! ✅
+
+🚀 2. Collecting OOF Predictions for Women...
+  [Year 2012] Data prep... CatBoost... XGBoost... LightGBM... Done! ✅
+  [Year 2013] Data prep... CatBoost... XGBoost... LightGBM... Done! ✅
+  [Year 2014] Data prep... CatBoost... XGBoost... LightGBM... Done! ✅
+  [Year 2015] Data prep... CatBoost... XGBoost... LightGBM... Done! ✅
+  [Year 2016] Data prep... CatBoost... XGBoost... LightGBM... Done! ✅
+  [Year 2017] Data prep... CatBoost... XGBoost... LightGBM... Done! ✅
+  [Year 2018] Data prep... CatBoost... XGBoost... LightGBM... Done! ✅
+  [Year 2019] Data prep... CatBoost... XGBoost... LightGBM... Done! ✅
+  [Year 2021] Data prep... CatBoost... XGBoost... LightGBM... Done! ✅
+  [Year 2022] Data prep... CatBoost... XGBoost... LightGBM... Done! ✅
+  [Year 2023] Data prep... CatBoost... XGBoost... LightGBM... Done! ✅
+  [Year 2024] Data prep... CatBoost... XGBoost... LightGBM... Done! ✅
+  [Year 2025] Data prep... CatBoost... XGBoost... LightGBM... Done! ✅
+
+🚀 3. Optimizing Global Blending Weights...
+💡 Men's Global Best Weights   : CatBoost 0.336, XGBoost 0.344, LightGBM 0.320, Elo 0.000
+💡 Women's Global Best Weights : CatBoost 0.665, XGBoost 0.000, LightGBM 0.335, Elo 0.000
+
+🚀 4. Applying Isotonic Calibration & Evaluating...
+
+| Year | Men's Brier | Women's Brier | Total Weighted Brier |
+| 2012 | M: 0.1642 | W: 0.1112 | Total: 0.1389 |
+| 2013 | M: 0.1885 | W: 0.1332 | Total: 0.1617 |
+| 2014 | M: 0.1760 | W: 0.1210 | Total: 0.1493 |
+| 2015 | M: 0.1652 | W: 0.1107 | Total: 0.1388 |
+| 2016 | M: 0.1785 | W: 0.1527 | Total: 0.1663 |
+| 2017 | M: 0.1629 | W: 0.1206 | Total: 0.1424 |
+| 2018 | M: 0.1861 | W: 0.1479 | Total: 0.1676 |
+| 2019 | M: 0.1477 | W: 0.1297 | Total: 0.1390 |
+| 2021 | M: 0.1972 | W: 0.1269 | Total: 0.1629 |
+| 2022 | M: 0.2172 | W: 0.1467 | Total: 0.1822 |
+| 2023 | M: 0.2089 | W: 0.1723 | Total: 0.1911 |
+| 2024 | M: 0.1807 | W: 0.1246 | Total: 0.1527 |
+| 2025 | M: 0.1564 | W: 0.1114 | Total: 0.1339 |
+----------------------------------------------------------------------------------------------------
+🎯 최후의 0.12 고지 함락 V48 (Deep Params + Global Weights + Isotonic) 평균 Brier Score: 0.15591
+⏱️ 총 소요 시간: 4.8분
+----------------------------------------------------------------------------------------------------

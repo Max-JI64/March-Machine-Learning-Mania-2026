@@ -1,0 +1,24 @@
+/Users/swoo64/.matplotlib is not a writable directory
+Matplotlib created a temporary cache directory at /var/folders/5r/gp1130xx2t5fbxbgt43xtp_m0000gn/T/matplotlib-j8w4pa5m because there was an issue with the default path (/Users/swoo64/.matplotlib); it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
+
+🔥 V49: V43 Revival + Dual-Resolution Models + Soft Calibration
+
+🚀 Starting V49 Evaluation (Base + Deep Ensemble)...
+| Year | Men's Brier | Women's Brier | Total Weighted Brier |
+  [Year 2012] Training Dual-Resolution Models... Done! ✅ -> M: 0.1442 | W: 0.1025 | Total: 0.1243
+  [Year 2013] Training Dual-Resolution Models... Done! ✅ -> M: 0.1708 | W: 0.1145 | Total: 0.1435
+  [Year 2014] Training Dual-Resolution Models... Done! ✅ -> M: 0.1688 | W: 0.1012 | Total: 0.1360
+  [Year 2015] Training Dual-Resolution Models... Done! ✅ -> M: 0.1420 | W: 0.0874 | Total: 0.1155
+  [Year 2016] Training Dual-Resolution Models... Done! ✅ -> M: 0.1529 | W: 0.1182 | Total: 0.1365
+  [Year 2017] Training Dual-Resolution Models... Done! ✅ -> M: 0.1340 | W: 0.0964 | Total: 0.1158
+  [Year 2018] Training Dual-Resolution Models... Done! ✅ -> M: 0.1687 | W: 0.1230 | Total: 0.1465
+  [Year 2019] Training Dual-Resolution Models... Done! ✅ -> M: 0.1292 | W: 0.1221 | Total: 0.1258
+  [Year 2021] Training Dual-Resolution Models... Done! ✅ -> M: 0.1704 | W: 0.1085 | Total: 0.1402
+  [Year 2022] Training Dual-Resolution Models... Done! ✅ -> M: 0.1979 | W: 0.1383 | Total: 0.1683
+  [Year 2023] Training Dual-Resolution Models... Done! ✅ -> M: 0.1784 | W: 0.1661 | Total: 0.1724
+  [Year 2024] Training Dual-Resolution Models... Done! ✅ -> M: 0.1648 | W: 0.1120 | Total: 0.1384
+  [Year 2025] Training Dual-Resolution Models... Done! ✅ -> M: 0.1285 | W: 0.0853 | Total: 0.1069
+----------------------------------------------------------------------------------------------------
+🎯 V49 (V43 Revival + Dual-Res + Soft Calib) 평균 Brier Score: 0.13615
+⏱️ 총 소요 시간: 7.4분
+----------------------------------------------------------------------------------------------------
