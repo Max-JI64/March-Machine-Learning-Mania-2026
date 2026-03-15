@@ -1,0 +1,54 @@
+/Users/swoo64/.matplotlib is not a writable directory
+Matplotlib created a temporary cache directory at /var/folders/5r/gp1130xx2t5fbxbgt43xtp_m0000gn/T/matplotlib-whasbkcp because there was an issue with the default path (/Users/swoo64/.matplotlib); it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
+================================================================================
+V60: Dramatic Paradigm Shift (Margin Regression -> CDF Probability Mapping)
+Seeds: 5 | Models: Cat, XGB, LGB, Ridge | Target: WScore - LScore
+================================================================================
+
+Loading data...
+Men features: 36 | Women features: 35
+
+================================================================================
+Phase 1: Predicting Point Margins for all Tourney Games (2012-2025)
+================================================================================
+  [Year 2012] Processing... Done in 19.3s -> Margin RMSE (M: 9.15, W: 10.37)
+  [Year 2013] Processing... Done in 19.9s -> Margin RMSE (M: 13.00, W: 10.93)
+  [Year 2014] Processing... Done in 18.8s -> Margin RMSE (M: 10.33, W: 12.21)
+  [Year 2015] Processing... Done in 17.9s -> Margin RMSE (M: 9.54, W: 9.91)
+  [Year 2016] Processing... Done in 18.5s -> Margin RMSE (M: 12.04, W: 11.66)
+  [Year 2017] Processing... Done in 18.0s -> Margin RMSE (M: 10.15, W: 13.37)
+  [Year 2018] Processing... Done in 18.5s -> Margin RMSE (M: 12.21, W: 14.19)
+  [Year 2019] Processing... Done in 19.4s -> Margin RMSE (M: 11.36, W: 10.78)
+  [Year 2021] Processing... Done in 18.6s -> Margin RMSE (M: 12.03, W: 11.17)
+  [Year 2022] Processing... Done in 18.1s -> Margin RMSE (M: 12.40, W: 12.53)
+  [Year 2023] Processing... Done in 18.1s -> Margin RMSE (M: 11.49, W: 11.83)
+  [Year 2024] Processing... Done in 19.1s -> Margin RMSE (M: 12.30, W: 10.27)
+  [Year 2025] Processing... Done in 18.7s -> Margin RMSE (M: 10.32, W: 13.95)
+
+================================================================================
+Phase 2: Optimizing Probability Mapping (CDF std_dev)
+================================================================================
+Optimal Std Dev for M: 10.431 | Best Brier: 0.18235
+Optimal Std Dev for W: 11.500 | Best Brier: 0.13457
+
+================================================================================
+Phase 3: Final Brier Scores by Year (V60)
+================================================================================
+| Year | Men Brier | Women Brier | Total |
+| 2012 | 0.1612 | 0.1174 | 0.1403 |
+| 2013 | 0.1837 | 0.1529 | 0.1688 |
+| 2014 | 0.1944 | 0.1202 | 0.1584 |
+| 2015 | 0.1629 | 0.1144 | 0.1394 |
+| 2016 | 0.1866 | 0.1471 | 0.1679 |
+| 2017 | 0.1636 | 0.1288 | 0.1467 |
+| 2018 | 0.1905 | 0.1456 | 0.1687 |
+| 2019 | 0.1581 | 0.1333 | 0.1461 |
+| 2021 | 0.2044 | 0.1263 | 0.1662 |
+| 2022 | 0.2182 | 0.1460 | 0.1824 |
+| 2023 | 0.2123 | 0.1773 | 0.1953 |
+| 2024 | 0.1825 | 0.1290 | 0.1558 |
+| 2025 | 0.1506 | 0.1097 | 0.1301 |
+--------------------------------------------------------------------------------
+V60 Final Average Brier Score: 0.15893
+
+Total time: 4.3min

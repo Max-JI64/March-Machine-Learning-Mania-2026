@@ -1,0 +1,58 @@
+/Users/swoo64/.matplotlib is not a writable directory
+Matplotlib created a temporary cache directory at /var/folders/5r/gp1130xx2t5fbxbgt43xtp_m0000gn/T/matplotlib-7jwnkfpl because there was an issue with the default path (/Users/swoo64/.matplotlib); it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
+================================================================================
+V61: Margin Regression Ensemble Weight Optimization
+Seeds: 5 | Models: Cat, XGB, LGB, Ridge
+================================================================================
+
+Loading data...
+
+================================================================================
+Phase 1: Generating Unweighted Margin Predictions (13 years)
+================================================================================
+  [Year 2012] Processing... Done in 17.8s
+  [Year 2013] Processing... Done in 17.7s
+  [Year 2014] Processing... Done in 17.6s
+  [Year 2015] Processing... Done in 17.7s
+  [Year 2016] Processing... Done in 17.5s
+  [Year 2017] Processing... Done in 17.7s
+  [Year 2018] Processing... Done in 17.9s
+  [Year 2019] Processing... Done in 18.3s
+  [Year 2021] Processing... Done in 17.9s
+  [Year 2022] Processing... Done in 17.6s
+  [Year 2023] Processing... Done in 18.4s
+  [Year 2024] Processing... Done in 18.3s
+  [Year 2025] Processing... Done in 18.8s
+
+================================================================================
+Phase 2: Optimizing Weights & StdDev simultaneously via Scipy
+================================================================================
+Men Optimal Weights: Cat=0.000, XGB=0.350, LGB=0.146, Ridge=0.504
+Men Optimal StdDev: 10.514 | Best Training Brier: 0.18173
+
+Women Optimal Weights: Cat=0.000, XGB=0.000, LGB=0.520, Ridge=0.480
+Women Optimal StdDev: 11.074 | Best Training Brier: 0.13273
+
+
+================================================================================
+Phase 3: Final Brier Scores by Year (V61 Weighted)
+================================================================================
+| Year | Men Brier | Women Brier | Total |
+| 2012 | 0.1540 | 0.1138 | 0.1348 |
+| 2013 | 0.1785 | 0.1509 | 0.1651 |
+| 2014 | 0.1947 | 0.1195 | 0.1583 |
+| 2015 | 0.1662 | 0.1114 | 0.1397 |
+| 2016 | 0.1891 | 0.1455 | 0.1685 |
+| 2017 | 0.1661 | 0.1265 | 0.1469 |
+| 2018 | 0.1864 | 0.1431 | 0.1654 |
+| 2019 | 0.1576 | 0.1260 | 0.1423 |
+| 2021 | 0.2047 | 0.1284 | 0.1674 |
+| 2022 | 0.2188 | 0.1403 | 0.1799 |
+| 2023 | 0.2127 | 0.1757 | 0.1948 |
+| 2024 | 0.1802 | 0.1319 | 0.1560 |
+| 2025 | 0.1520 | 0.1107 | 0.1314 |
+--------------------------------------------------------------------------------
+V60 Default Average Brier: 0.15893
+V61 Final Average Brier Score: 0.15772 (delta: -0.00121)
+
+Total time: 4.1min

@@ -1,0 +1,93 @@
+/Users/swoo64/.matplotlib is not a writable directory
+Matplotlib created a temporary cache directory at /var/folders/5r/gp1130xx2t5fbxbgt43xtp_m0000gn/T/matplotlib-w_a9dgp7 because there was an issue with the default path (/Users/swoo64/.matplotlib); it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
+================================================================================
+V58: Optuna Re-tuning XGBoost & LightGBM (V55 Leakage-Free Pipeline)
+XGB Trials: 40 | LGB Trials: 40
+Tune: 2 seeds x 3 years | Final: 10 seeds x 13 years
+================================================================================
+
+Loading data...
+Men features: 36 | Women features: 35
+
+================================================================================
+Phase 1: Pre-computing CatBoost/L1/EN/Elo + default XGB/LGB predictions
+================================================================================
+  Pre-compute [1/12] M 2023 seed=42
+  Pre-compute [2/12] M 2023 seed=123
+  Pre-compute [3/12] M 2024 seed=42
+  Pre-compute [4/12] M 2024 seed=123
+  Pre-compute [5/12] M 2025 seed=42
+  Pre-compute [6/12] M 2025 seed=123
+  Pre-compute [7/12] W 2023 seed=42
+  Pre-compute [8/12] W 2023 seed=123
+  Pre-compute [9/12] W 2024 seed=42
+  Pre-compute [10/12] W 2024 seed=123
+  Pre-compute [11/12] W 2025 seed=42
+  Pre-compute [12/12] W 2025 seed=123
+Pre-compute done in 1.2min (12 combos)
+Default V55 Tune Brier (2 seeds x 3 years): 0.16713
+
+================================================================================
+Phase 2: Optuna XGBoost (40 trials)
+================================================================================
+XGB done in 2.1min | Best Brier: 0.16499
+Best XGB: {
+  "n_estimators": 1031,
+  "learning_rate": 0.09723715896808606,
+  "max_depth": 3,
+  "subsample": 0.7345903063128036,
+  "colsample_bytree": 0.4190644245632966,
+  "min_child_weight": 8,
+  "gamma": 4.938688107185496,
+  "reg_alpha": 3.132435297422954,
+  "reg_lambda": 8.9524347301124
+}
+Updating cache with optimal XGB...
+After XGB Opt Tune Brier: 0.16499 (was 0.16713)
+
+================================================================================
+Phase 3: Optuna LightGBM (40 trials)
+================================================================================
+LGB done in 13.8min | Best Brier: 0.16411
+Best LGB: {
+  "n_estimators": 552,
+  "learning_rate": 0.006397677343464172,
+  "max_depth": 4,
+  "num_leaves": 22,
+  "subsample": 0.6802489333494661,
+  "colsample_bytree": 0.9772131285158165,
+  "min_child_samples": 7,
+  "reg_alpha": 0.004277192880490142,
+  "reg_lambda": 3.7486536387171476,
+  "objective": "regression"
+}
+
+================================================================================
+Optuna Summary
+================================================================================
+Default V55 Tune Brier:     0.16713
+After XGB Optimization:     0.16499 (delta: -0.00214)
+After XGB+LGB Optimization: 0.16411 (delta: -0.00302)
+
+================================================================================
+Phase 4: Final Full Evaluation (10 seeds x 13 years)
+================================================================================
+| Year | Men Brier | Women Brier | Total |
+| 2012 | 0.1734 | 0.1148 | 0.1455 |
+| 2013 | 0.1908 | 0.1483 | 0.1702 |
+| 2014 | 0.1988 | 0.1241 | 0.1626 |
+| 2015 | 0.1653 | 0.1239 | 0.1452 |
+| 2016 | 0.1828 | 0.1468 | 0.1658 |
+| 2017 | 0.1705 | 0.1268 | 0.1493 |
+| 2018 | 0.1923 | 0.1431 | 0.1684 |
+| 2019 | 0.1635 | 0.1346 | 0.1495 |
+| 2021 | 0.2036 | 0.1372 | 0.1711 |
+| 2022 | 0.2198 | 0.1485 | 0.1844 |
+| 2023 | 0.2087 | 0.1817 | 0.1956 |
+| 2024 | 0.1881 | 0.1339 | 0.1610 |
+| 2025 | 0.1557 | 0.1146 | 0.1352 |
+--------------------------------------------------------------------------------
+V58 Final Average Brier Score: 0.16184
+
+Total time: 26.7min
+Params saved to v58_best_params.json

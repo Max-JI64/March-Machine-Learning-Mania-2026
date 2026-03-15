@@ -1,0 +1,76 @@
+{
+  "best_params_m": {
+    "ridge": {
+      "alpha": 21.74547098137361
+    },
+    "xgb": {
+      "n_estimators": 545,
+      "learning_rate": 0.019553708662745254,
+      "max_depth": 5,
+      "subsample": 0.569746930326021,
+      "colsample_bytree": 0.575286789121131,
+      "min_child_weight": 4,
+      "gamma": 2.28034992108518,
+      "reg_alpha": 1.3826232179369866,
+      "reg_lambda": 0.2508115686045233
+    },
+    "lgb": {
+      "n_estimators": 549,
+      "learning_rate": 0.016310557664455546,
+      "max_depth": 6,
+      "num_leaves": 36,
+      "subsample": 0.9744327790037302,
+      "colsample_bytree": 0.5440470957242425,
+      "min_child_samples": 40,
+      "reg_alpha": 0.8337628808696234,
+      "reg_lambda": 2.712927280907586
+    },
+    "cat": {
+      "iterations": 634,
+      "learning_rate": 0.02978180265758444,
+      "depth": 4,
+      "l2_leaf_reg": 7.596241553491607,
+      "subsample": 0.9252111953481298,
+      "random_strength": 3.8191090659649998,
+      "bagging_temperature": 1.871964230793136,
+      "border_count": 126
+    }
+  },
+  "best_params_w": {
+    "ridge": {
+      "alpha": 0.10141533414024924
+    },
+    "xgb": {
+      "n_estimators": 446,
+      "learning_rate": 0.012739717248675893,
+      "max_depth": 3,
+      "subsample": 0.7033101078972073,
+      "colsample_bytree": 0.8083586560247147,
+      "min_child_weight": 4,
+      "gamma": 4.575986632218548,
+      "reg_alpha": 0.11788261115600578,
+      "reg_lambda": 0.19054292153587105
+    },
+    "lgb": {
+      "n_estimators": 418,
+      "learning_rate": 0.015525215207220354,
+      "max_depth": 2,
+      "num_leaves": 33,
+      "subsample": 0.7051102112946549,
+      "colsample_bytree": 0.9973480316348629,
+      "min_child_samples": 29,
+      "reg_alpha": 0.011984092004866314,
+      "reg_lambda": 0.2104934511735364
+    },
+    "cat": {
+      "iterations": 378,
+      "learning_rate": 0.02784994259025061,
+      "depth": 3,
+      "l2_leaf_reg": 4.995251277534228,
+      "subsample": 0.8255044162944254,
+      "random_strength": 4.11450321427235,
+      "bagging_temperature": 1.729503384213025,
+      "border_count": 126
+    }
+  }
+}

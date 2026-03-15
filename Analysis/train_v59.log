@@ -1,0 +1,149 @@
+/Users/swoo64/.matplotlib is not a writable directory
+Matplotlib created a temporary cache directory at /var/folders/5r/gp1130xx2t5fbxbgt43xtp_m0000gn/T/matplotlib-6_n9sbgl because there was an issue with the default path (/Users/swoo64/.matplotlib); it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
+================================================================================
+V59: Triple-Threat (CatBoost Retune + Weight Opt + Temperature Scaling)
+CatBoost Trials: 60
+================================================================================
+Men features: 36 | Women features: 35
+
+================================================================================
+Phase 1: Pre-compute for CatBoost Optuna (XGB_v58 + LGB_v58 + L1 + EN + Elo)
+================================================================================
+Done in 0.3min
+
+================================================================================
+Phase 2: CatBoost Optuna (60 trials)
+================================================================================
+CatBoost done in 5.7min | Best Tune Brier: 0.16274
+Best CatBoost: {
+  "iterations": 1069,
+  "learning_rate": 0.0057309170435207194,
+  "depth": 3,
+  "l2_leaf_reg": 0.636908317354237,
+  "subsample": 0.7294638849535738,
+  "random_strength": 3.316704523356106,
+  "bagging_temperature": 1.5180251146397887,
+  "border_count": 160
+}
+
+================================================================================
+Phase 3: Full 13-year pre-compute (10 seeds x 13 years, cache individual model preds)
+================================================================================
+  Full pre-compute: M 2012 done
+  Full pre-compute: M 2013 done
+  Full pre-compute: M 2014 done
+  Full pre-compute: M 2015 done
+  Full pre-compute: M 2016 done
+  Full pre-compute: M 2017 done
+  Full pre-compute: M 2018 done
+  Full pre-compute: M 2019 done
+  Full pre-compute: M 2021 done
+  Full pre-compute: M 2022 done
+  Full pre-compute: M 2023 done
+  Full pre-compute: M 2024 done
+  Full pre-compute: M 2025 done
+  Full pre-compute: W 2012 done
+  Full pre-compute: W 2013 done
+  Full pre-compute: W 2014 done
+  Full pre-compute: W 2015 done
+  Full pre-compute: W 2016 done
+  Full pre-compute: W 2017 done
+  Full pre-compute: W 2018 done
+  Full pre-compute: W 2019 done
+  Full pre-compute: W 2021 done
+  Full pre-compute: W 2022 done
+  Full pre-compute: W 2023 done
+  Full pre-compute: W 2024 done
+  Full pre-compute: W 2025 done
+Done in 7.4min
+
+--- V58 Baseline (for comparison) ---
+
+================================================================================
+FINAL RESULTS: V59 Triple-Threat
+================================================================================
+| Year | Men Brier | Women Brier | Total |
+| 2012 | 0.1748 | 0.1128 | 0.1452 |
+| 2013 | 0.1921 | 0.1475 | 0.1705 |
+| 2014 | 0.1992 | 0.1254 | 0.1635 |
+| 2015 | 0.1666 | 0.1217 | 0.1448 |
+| 2016 | 0.1840 | 0.1491 | 0.1674 |
+| 2017 | 0.1696 | 0.1273 | 0.1491 |
+| 2018 | 0.1942 | 0.1445 | 0.1701 |
+| 2019 | 0.1648 | 0.1333 | 0.1496 |
+| 2021 | 0.2055 | 0.1371 | 0.1721 |
+| 2022 | 0.2210 | 0.1468 | 0.1842 |
+| 2023 | 0.2104 | 0.1748 | 0.1931 |
+| 2024 | 0.1891 | 0.1303 | 0.1597 |
+| 2025 | 0.1539 | 0.1154 | 0.1346 |
+--------------------------------------------------------------------------------
+V59 Final Average Brier Score: 0.16183
+
+================================================================================
+Phase 4: Scipy Weight Optimization (gender-specific)
+================================================================================
+Men weights: Cat=0.000 XGB=0.000 LGB=0.526 L1=0.217 EN=0.222 Elo=0.035
+Women weights: Cat=0.402 XGB=0.168 LGB=0.000 L1=0.089 EN=0.341 Elo=0.000
+
+--- After Weight Optimization ---
+
+================================================================================
+FINAL RESULTS: V59 Triple-Threat
+================================================================================
+| Year | Men Brier | Women Brier | Total |
+| 2012 | 0.1711 | 0.1082 | 0.1410 |
+| 2013 | 0.1867 | 0.1483 | 0.1681 |
+| 2014 | 0.2008 | 0.1249 | 0.1641 |
+| 2015 | 0.1696 | 0.1199 | 0.1455 |
+| 2016 | 0.1823 | 0.1485 | 0.1663 |
+| 2017 | 0.1691 | 0.1247 | 0.1476 |
+| 2018 | 0.1887 | 0.1468 | 0.1684 |
+| 2019 | 0.1613 | 0.1312 | 0.1467 |
+| 2021 | 0.2026 | 0.1358 | 0.1699 |
+| 2022 | 0.2245 | 0.1471 | 0.1861 |
+| 2023 | 0.2138 | 0.1789 | 0.1969 |
+| 2024 | 0.1866 | 0.1276 | 0.1571 |
+| 2025 | 0.1552 | 0.1117 | 0.1334 |
+--------------------------------------------------------------------------------
+V59 Final Average Brier Score: 0.16085
+
+================================================================================
+Phase 5: Temperature Scaling + Clip Optimization (gender-specific)
+================================================================================
+Men: T=1.006, Clip=(0.0525, 0.9464)
+Women: T=1.001, Clip=(0.0134, 0.9910)
+
+================================================================================
+COMPARISON: V58 vs V59 Components
+================================================================================
+
+[A] V58 Baseline (CatBoost V23 + V58 weights):    0.16183
+[B] + CatBoost Retune (Optuna 60 trials):     0.16183 -> see below
+[C] + Weight Optimization (Scipy):               0.16085
+
+================================================================================
+FINAL RESULTS: V59 Triple-Threat
+================================================================================
+| Year | Men Brier | Women Brier | Total |
+| 2012 | 0.1711 | 0.1082 | 0.1411 |
+| 2013 | 0.1867 | 0.1483 | 0.1681 |
+| 2014 | 0.2008 | 0.1249 | 0.1640 |
+| 2015 | 0.1697 | 0.1199 | 0.1456 |
+| 2016 | 0.1823 | 0.1485 | 0.1663 |
+| 2017 | 0.1692 | 0.1247 | 0.1476 |
+| 2018 | 0.1886 | 0.1468 | 0.1683 |
+| 2019 | 0.1614 | 0.1312 | 0.1467 |
+| 2021 | 0.2025 | 0.1358 | 0.1699 |
+| 2022 | 0.2243 | 0.1471 | 0.1860 |
+| 2023 | 0.2137 | 0.1789 | 0.1968 |
+| 2024 | 0.1865 | 0.1276 | 0.1571 |
+| 2025 | 0.1554 | 0.1117 | 0.1335 |
+--------------------------------------------------------------------------------
+V59 Final Average Brier Score: 0.16085
+
+[D] + Temperature Scaling + Clip (FINAL V59):    0.16085
+
+================================================================================
+V58 -> V59 Total Improvement: 0.16183 -> 0.16085 (delta: -0.00098)
+Total time: 13.5min
+Config saved to v59_config.json
